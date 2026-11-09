@@ -1,0 +1,113 @@
+<section class="w-full bg-white font-sans py-16 sm:py-20 border-t border-gray-200">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <!-- Top Header Layout -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-baseline border-b border-gray-200 pb-4 mb-12 sm:mb-16">
+      <h2 class="text-4xl sm:text-5xl lg:text-6xl font-serif text-black font-normal tracking-tight">
+        Curated for every occasion.
+      </h2>
+      <p class="text-[11px] sm:text-xs text-gray-500 tracking-wider max-w-xs mt-3 md:mt-0 leading-relaxed font-light">
+        From Lahore mornings to wedding evenings, discover Pakistani wear designed for the way you live.
+      </p>
+    </div>
+
+    <!-- Staggered 3-Column Card Grid -->
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-6 lg:gap-8 items-start">
+      
+      <!-- Card 1: Festive Formals (Standard Position) -->
+      <a 
+        [routerLink]="occasions[0].route" 
+        class="group relative block aspect-[3/4] w-full overflow-hidden bg-neutral-100">
+        <img 
+          [src]="occasions[0].image" 
+          [alt]="occasions[0].alt"
+          class="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
+          loading="lazy"
+        />
+        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"></div>
+        
+        <!-- Bottom Overlay Info -->
+        <div class="absolute bottom-6 left-6 right-6 flex items-end justify-between text-white z-10">
+          <div>
+            <h3 class="text-lg sm:text-3xl font-serif font-normal tracking-wide">
+              {{ occasions[0].title }}
+            </h3>
+            <span class="text-[10px] tracking-[0.2em] uppercase font-semibold text-gray-300 block mt-1">
+              EXPLORE COLLECTION
+            </span>
+          </div>
+          <div class="w-9 h-9 rounded-full border border-white/60 flex items-center justify-center transition-colors duration-300 group-hover:bg-white group-hover:text-black">
+            <svg class="w-4 h-4 transform -rotate-45 group-hover:rotate-0 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </div>
+        </div>
+      </a>
+
+      <!-- Card 2: Luxury Lawn (Staggered Downwards) -->
+      <a 
+        [routerLink]="occasions[1].route" 
+        class="group relative block aspect-[3/4] w-full overflow-hidden bg-neutral-100 md:translate-y-10">
+        <img 
+          [src]="occasions[1].image" 
+          [alt]="occasions[1].alt"
+          class="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
+          loading="lazy"
+        />
+        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"></div>
+
+        <!-- Bottom Overlay Info -->
+        <div class="absolute bottom-6 left-6 right-6 flex items-end justify-between text-white z-10">
+          <div>
+            <h3 class="text-lg sm:text-3xl font-serif font-normal tracking-wide">
+              {{ occasions[1].title }}
+            </h3>
+            <span class="text-[10px] tracking-[0.2em] uppercase font-semibold text-gray-300 block mt-1">
+              EXPLORE COLLECTION
+            </span>
+          </div>
+          <div class="w-9 h-9 rounded-full border border-white/60 flex items-center justify-center transition-colors duration-300 group-hover:bg-white group-hover:text-black">
+            <svg class="w-4 h-4 transform -rotate-45 group-hover:rotate-0 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </div>
+        </div>
+      </a>
+
+      <!-- Card 3: Ready to Wear (Standard Position) -->
+      <a 
+        [routerLink]="occasions[2].route" 
+        class="group relative block aspect-[3/4] w-full overflow-hidden bg-neutral-100 mt-6 md:mt-0">
+        <img 
+          [src]="occasions[2].image" 
+          [alt]="occasions[2].alt"
+          class="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
+          loading="lazy"
+        />
+        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"></div>
+
+        <!-- Bottom Overlay Info -->
+        <div class="absolute bottom-6 left-6 right-6 flex items-end justify-between text-white z-10">
+          <div>
+            <h3 class="text-lg sm:text-3xl font-serif font-normal tracking-wide">
+              {{ occasions[2].title }}
+            </h3>
+            <span class="text-[10px] tracking-[0.2em] uppercase font-semibold text-gray-300 block mt-1">
+              EXPLORE COLLECTION
+            </span>
+          </div>
+          <div class="w-9 h-9 rounded-full border border-white/60 flex items-center justify-center transition-colors duration-300 group-hover:bg-white group-hover:text-black">
+            <svg class="w-4 h-4 transform -rotate-45 group-hover:rotate-0 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </div>
+        </div>
+      </a>
+
+    </div>
+
+  </div>
+</section>

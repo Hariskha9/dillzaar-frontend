@@ -1,0 +1,157 @@
+<div class="space-y-8 font-sans text-gray-200">
+  
+  <!-- Welcome / Header Banner -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-serif font-bold text-white tracking-wide">Dashboard</h1>
+      <p class="text-xs text-gray-400 mt-1">Here is what's happening in your store today.</p>
+    </div>
+    <div class="flex items-center space-x-3">
+      <button class="bg-[#2a2a2a] hover:bg-[#333] text-gray-200 px-4 py-2 text-xs font-semibold tracking-wider uppercase border border-[#3d3d3d] transition-colors">
+        Export Report
+      </button>
+      <button class="bg-white hover:bg-gray-200 text-black px-4 py-2 text-xs font-semibold tracking-wider uppercase transition-colors">
+        Add Product
+      </button>
+    </div>
+  </div>
+
+  <!-- Statistics Cards Grid -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div *ngFor="let stat of stats" class="bg-[#1e1e1e] border border-[#2d2d2d] p-6 rounded-none shadow-sm flex flex-col justify-between">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-medium text-gray-400 uppercase tracking-wider">{{ stat.title }}</span>
+        <span [ngClass]="stat.isPositive ? 'text-emerald-400 bg-emerald-950/40' : 'text-rose-400 bg-rose-950/40'" 
+              class="text-[10px] font-semibold px-2 py-0.5 rounded">
+          {{ stat.change }}
+        </span>
+      </div>
+      <div class="mt-4">
+        <h3 class="text-2xl font-bold font-serif text-white tracking-tight">{{ stat.value }}</h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- Graphs Section Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    
+    <!-- Sales Overview Graph Box (Takes up 2 columns) -->
+    <div class="lg:col-span-2 bg-[#1e1e1e] border border-[#2d2d2d] p-6 flex flex-col justify-between">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-sm font-semibold tracking-wider uppercase text-gray-200">Revenue & Sales Performance</h3>
+        <span class="text-xs text-gray-400 cursor-pointer hover:text-white">Last 30 days &bull;</span>
+      </div>
+      
+      <!-- Graph Placeholder Visual (Can be replaced with Chart.js or Ngx-Charts) -->
+      <div class="h-64 w-full flex items-end justify-between gap-2 pt-6 px-2 border-b border-[#2d2d2d]">
+        <div class="w-full bg-[#2a2a2a] hover:bg-[#3b4252] transition-colors h-[40%] rounded-t-sm relative group">
+          <span class="absolute -top-6 left-1/2 transform -translate-x-1/2 text-[10px] text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">12k</span>
+        </div>
+        <div class="w-full bg-[#2a2a2a] hover:bg-[#3b4252] transition-colors h-[65%] rounded-t-sm relative group">
+          <span class="absolute -top-6 left-1/2 transform -translate-x-1/2 text-[10px] text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">24k</span>
+        </div>
+        <div class="w-full bg-[#2a2a2a] hover:bg-[#3b4252] transition-colors h-[50%] rounded-t-sm relative group">
+          <span class="absolute -top-6 left-1/2 transform -translate-x-1/2 text-[10px] text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">18k</span>
+        </div>
+        <div class="w-full bg-[#2a2a2a] hover:bg-[#3b4252] transition-colors h-[80%] rounded-t-sm relative group">
+          <span class="absolute -top-6 left-1/2 transform -translate-x-1/2 text-[10px] text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">35k</span>
+        </div>
+        <div class="w-full bg-[#2a2a2a] hover:bg-[#3b4252] transition-colors h-[95%] rounded-t-sm relative group">
+          <span class="absolute -top-6 left-1/2 transform -translate-x-1/2 text-[10px] text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">48k</span>
+        </div>
+        <div class="w-full bg-[#3b4252] h-[70%] rounded-t-sm relative group">
+          <span class="absolute -top-6 left-1/2 transform -translate-x-1/2 text-[10px] text-gray-200">30k</span>
+        </div>
+        <div class="w-full bg-[#2a2a2a] hover:bg-[#3b4252] transition-colors h-[85%] rounded-t-sm relative group">
+          <span class="absolute -top-6 left-1/2 transform -translate-x-1/2 text-[10px] text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">42k</span>
+        </div>
+      </div>
+      <div class="flex justify-between text-[10px] text-gray-500 uppercase tracking-wider mt-3">
+        <span>Week 1</span>
+        <span>Week 2</span>
+        <span>Week 3</span>
+        <span>Week 4</span>
+      </div>
+    </div>
+
+    <!-- Category Sales Breakdown -->
+    <div class="bg-[#1e1e1e] border border-[#2d2d2d] p-6 flex flex-col justify-between">
+      <div>
+        <h3 class="text-sm font-semibold tracking-wider uppercase text-gray-200 mb-4">Top Categories</h3>
+        <div class="space-y-4 mt-6">
+          <div>
+            <div class="flex justify-between text-xs mb-1">
+              <span class="text-gray-300">Luxury Lawn</span>
+              <span class="text-gray-400 font-semibold">54%</span>
+            </div>
+            <div class="w-full bg-[#2a2a2a] h-2 rounded-full overflow-hidden">
+              <div class="bg-white h-full w-[54%]"></div>
+            </div>
+          </div>
+          <div>
+            <div class="flex justify-between text-xs mb-1">
+              <span class="text-gray-300">Festive Formals</span>
+              <span class="text-gray-400 font-semibold">28%</span>
+            </div>
+            <div class="w-full bg-[#2a2a2a] h-2 rounded-full overflow-hidden">
+              <div class="bg-neutral-400 h-full w-[28%]"></div>
+            </div>
+          </div>
+          <div>
+            <div class="flex justify-between text-xs mb-1">
+              <span class="text-gray-300">Ready to Wear</span>
+              <span class="text-gray-400 font-semibold">18%</span>
+            </div>
+            <div class="w-full bg-[#2a2a2a] h-2 rounded-full overflow-hidden">
+              <div class="bg-neutral-600 h-full w-[18%]"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="text-[11px] text-gray-500 text-right mt-6">
+        Updated 5 mins ago
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Recent Orders Table Section -->
+  <div class="bg-[#1e1e1e] border border-[#2d2d2d] overflow-hidden">
+    <div class="p-6 border-b border-[#2d2d2d] flex items-center justify-between">
+      <h3 class="text-sm font-semibold tracking-wider uppercase text-gray-200">Recent Store Orders</h3>
+      <a routerLink="/admin/orders" class="text-xs text-gray-400 hover:text-white transition-colors">View All &rarr;</a>
+    </div>
+    
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-xs">
+        <thead class="bg-[#161616] text-gray-400 uppercase tracking-wider border-b border-[#2d2d2d]">
+          <tr>
+            <th class="py-3 px-6">Order ID</th>
+            <th class="py-3 px-6">Customer</th>
+            <th class="py-3 px-6">Product</th>
+            <th class="py-3 px-6">Amount</th>
+            <th class="py-3 px-6">Status</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-[#2d2d2d]">
+          <tr *ngFor="let order of recentOrders" class="hover:bg-[#252525] transition-colors">
+            <td class="py-4 px-6 font-medium text-white">{{ order.id }}</td>
+            <td class="py-4 px-6 text-gray-300">{{ order.customer }}</td>
+            <td class="py-4 px-6 text-gray-400">{{ order.product }}</td>
+            <td class="py-4 px-6 font-semibold text-white">{{ order.amount }}</td>
+            <td class="py-4 px-6">
+              <span [ngClass]="{
+                'bg-emerald-950/50 text-emerald-400 border border-emerald-800/40': order.status === 'Completed',
+                'bg-amber-950/50 text-amber-400 border border-amber-800/40': order.status === 'Processing' || order.status === 'Pending',
+                'bg-blue-950/50 text-blue-400 border border-blue-800/40': order.status === 'Shipped'
+              }" class="px-2.5 py-1 text-[10px] font-medium rounded-full uppercase tracking-wider">
+                {{ order.status }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>

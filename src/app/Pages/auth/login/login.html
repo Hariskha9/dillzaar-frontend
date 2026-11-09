@@ -1,0 +1,90 @@
+<section class="w-full min-h-[85vh] bg-[#F9F9F9] flex flex-col items-center justify-center py-16 px-4 font-sans">
+  
+  <!-- Page Header -->
+  <div class="text-center mb-10">
+    <span class="text-[10px] tracking-[0.25em] font-medium uppercase text-gray-500 block mb-2">
+      MY DillZaar
+    </span>
+    <h1 class="text-4xl sm:text-5xl font-serif font-normal text-black mb-3">
+      Welcome back.
+    </h1>
+    <p class="text-xs sm:text-sm text-gray-600 font-light tracking-wide">
+      Sign in to view orders and manage your details.
+    </p>
+  </div>
+
+  <!-- Form Box Card -->
+  <div class="w-full max-w-xl bg-white shadow-sm border border-gray-100 px-5 py-8 sm:px-12">
+    
+    <!-- Tab Switcher -->
+    <div class="flex border-b border-gray-200 mb-5">
+      <button 
+        type="button"
+        (click)="switchTab(true)"
+        [class]="isSignInTab ? 'border-b-2 border-black text-black font-semibold' : 'text-gray-400 font-medium hover:text-black'"
+        class="flex-1 pb-4 text-xs tracking-[0.2em] uppercase transition-colors text-center">
+        Sign In
+      </button>
+      <button 
+        type="button"
+        (click)="switchTab(false)"
+        [class]="!isSignInTab ? 'border-b-2 border-black text-black font-semibold' : 'text-gray-400 font-medium hover:text-black'"
+        class="flex-1 pb-4 text-xs tracking-[0.2em] uppercase transition-colors text-center">
+        Create Account
+      </button>
+    </div>
+
+    <!-- Login Form -->
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-3">
+      
+      <!-- Email Field -->
+      <div>
+        <label class="block text-xs md:text-[10px] text  font-semibold tracking-[0.2em] text-black uppercase mb-2">
+          Email Address
+        </label>
+        <input 
+          type="email" 
+          formControlName="email"
+          class="w-full h-10 px-4 border border-gray-300 rounded-none text-sm text-black focus:outline-none focus:border-black transition-colors bg-white"
+          placeholder=""
+        />
+        <div *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.invalid" class="text-red-500 text-[10px] mt-1 tracking-wider">
+          Please enter a valid email address.
+        </div>
+      </div>
+
+      <!-- Password Field -->
+      <div>
+        <label class="block text-xs md:text-[10px] font-semibold tracking-[0.2em] text-black uppercase mb-2">
+          Password
+        </label>
+        <input 
+          type="password" 
+          formControlName="password"
+          class="w-full h-10 px-4 border border-gray-300 rounded-none text-sm text-black focus:outline-none focus:border-black transition-colors bg-white"
+          placeholder=""
+        />
+        <div *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid" class="text-red-500 text-[10px] mt-1 tracking-wider">
+          Password must be at least 6 characters.
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <button 
+        type="submit" 
+        class="w-full h-12 bg-black text-white hover:bg-neutral-800 transition-colors text-xs font-semibold tracking-[0.2em] uppercase rounded-none mt-2">
+        Sign In
+      </button>
+
+    </form>
+
+    <!-- Form Footer Helper Text -->
+    <div class="text-center mt-2 pt-2 border-t border-gray-100">
+      <p class="text-[11px] text-gray-500 tracking-wider font-light">
+        Your account keeps your orders, addresses and wishlist together.
+      </p>
+    </div>
+
+  </div>
+
+</section>
