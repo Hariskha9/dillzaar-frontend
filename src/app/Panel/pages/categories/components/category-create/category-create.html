@@ -1,0 +1,284 @@
+<div class="flex min-h-screen bg-[#121212] font-sans text-gray-200">
+  
+  <!-- Main Category Form Section (Shrinks or shifts slightly when side drawer is open) -->
+  <div class="flex-1  space-y-6  mx-auto transition-all">
+    
+    <!-- Breadcrumb & Top Bar -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-[#2d2d2d] pb-6">
+      <div>
+        <div class="text-xs text-gray-400 mb-1">
+          <span>Dashboard</span> <span class="mx-1">/</span> 
+          <a routerLink="/admin/categories" class="hover:text-white underline">Categories</a> <span class="mx-1">/</span> 
+          <span class="text-white">Create New</span>  
+        </div>
+        <h1 class="text-3xl font-serif font-bold text-white tracking-wide">Untitled</h1>  
+        <span class="text-xs text-gray-400 mt-1 block">Creating new Category</span>  
+      </div>
+
+      <!-- Save Category Button -->
+      <div>
+        <button 
+          type="button" 
+          (click)="onSaveCategory()"
+          class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 text-xs font-semibold tracking-wider uppercase transition-colors rounded">
+          Save  
+        </button>
+      </div>
+    </div>
+
+    <!-- Category Form Container -->
+    <form [formGroup]="categoryForm" (ngSubmit)="onSaveCategory()" class="space-y-6 bg-[#1e1e1e] border border-[#2d2d2d] p-8 shadow-sm">
+      
+      <!-- Name Field -->
+      <div>
+        <label class="block text-xs font-semibold tracking-wider text-gray-300 uppercase mb-2">
+          Name <span class="text-rose-500">*</span>  
+        </label>
+        <input 
+          type="text" 
+          formControlName="name"
+          class="w-full bg-[#161616] border border-[#2d2d2d] rounded px-4 py-2.5 text-xs text-white focus:outline-none focus:border-gray-500 transition-colors"
+        />
+      </div>
+
+      <!-- Slug Field -->
+      <div>
+        <label class="block text-xs font-semibold tracking-wider text-gray-300 uppercase mb-2">
+          Slug <span class="text-rose-500">*</span>  
+        </label>
+        <input 
+          type="text" 
+          formControlName="slug"
+          class="w-full bg-[#161616] border border-[#2d2d2d] rounded px-4 py-2.5 text-xs text-white focus:outline-none focus:border-gray-500 transition-colors"
+        />
+      </div>
+
+      <!-- Description Field -->
+      <div>
+        <label class="block text-xs font-semibold tracking-wider text-gray-300 uppercase mb-2">
+          Description  
+        </label>
+        <textarea 
+          rows="4" 
+          formControlName="description"
+          class="w-full bg-[#161616] border border-[#2d2d2d] rounded p-4 text-xs text-white focus:outline-none focus:border-gray-500 transition-colors resize-y">
+        </textarea>
+      </div>
+
+      <!-- Image Selection Box -->
+      <div>
+        <label class="block text-xs font-semibold tracking-wider text-gray-300 uppercase mb-2">
+          Image  
+        </label>
+
+        <!-- Selected Preview Display -->
+        <div *ngIf="selectedImagePreview; else uploadButtonsBox" class="relative w-40 h-40 bg-[#161616] border border-[#3d3d3d] rounded overflow-hidden group">
+          <img [src]="selectedImagePreview" alt="Selected Category Image" class="w-full h-full object-cover" />
+          <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+            <button type="button" (click)="removeSelectedImage()" class="bg-rose-600 hover:bg-rose-500 text-white px-2.5 py-1 rounded text-xs">
+              Remove
+            </button>
+          </div>
+        </div>
+
+        <!-- Initial Buttons Triggering Drawers -->
+        <ng-template #uploadButtonsBox>
+          <div class="border border-dashed border-[#3d3d3d] bg-[#161616] p-6 rounded flex flex-col sm:flex-row items-center justify-center gap-3 text-center">
+            
+            <!-- Click triggers "Creating new Media" drawer -->
+            <button 
+              type="button" 
+              (click)="openCreateMediaDrawer()"
+              class="bg-[#2a2a2a] hover:bg-[#333] text-gray-200 px-3 py-1.5 text-xs font-medium rounded border border-[#3d3d3d] transition-colors cursor-pointer">
+              Create New  
+            </button>
+            
+            <span class="text-xs text-gray-400">or</span>  
+            
+            <!-- Click triggers "Choose from existing" media list drawer -->
+            <button 
+              type="button" 
+              (click)="openSelectMediaDrawer()"
+              class="bg-[#2a2a2a] hover:bg-[#333] text-gray-200 px-3 py-1.5 text-xs font-medium rounded border border-[#3d3d3d] transition-colors cursor-pointer">
+              Choose from existing  
+            </button>
+            
+            <span class="text-xs text-gray-400">or</span>  
+            
+            <div class="flex items-center space-x-2 text-xs text-gray-400">
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m6.75 12l-3-3m0 0l-3 3m3-3v6m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"></path>
+              </svg>
+              <span>or drag and drop a file</span>  
+            </div>
+          </div>
+        </ng-template>
+      </div>
+
+      <!-- Featured Checkbox -->
+      <div class="flex items-center space-x-3 pt-2">
+        <input 
+          type="checkbox" 
+          id="featured" 
+          formControlName="featured"
+          class="w-4 h-4 rounded bg-[#161616] border-[#3d3d3d] text-blue-600 focus:ring-0 cursor-pointer"
+        />
+        <label for="featured" class="text-xs font-semibold tracking-wider text-gray-300 uppercase cursor-pointer">
+          Featured  
+        </label>
+      </div>
+
+    </form>
+  </div>
+
+
+  <!-- ================= SIDE DRAWER: CREATE NEW MEDIA ================= -->
+  <div *ngIf="activeDrawer === 'create-media'" class="w-full lg:w-[500px] bg-[#181818] border-l border-[#2d2d2d] flex flex-col h-screen fixed top-0 right-0  shadow-2xl z-50 animate-slide-in">
+    
+    <!-- Drawer Header -->
+    <div class="h-16 flex items-center justify-between px-6 border-b border-[#2d2d2d]">
+      <div class="flex items-center space-x-2 text-xs text-gray-400">
+        <button (click)="closeDrawer()" class="hover:text-white text-2xl">&lsaquo;</button>
+        <span class="text-white font-medium">Creating new Media</span>   
+      </div>
+      <button 
+        type="button" 
+        (click)="saveNewMedia()"
+        class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-1.5 text-xs font-semibold uppercase rounded transition-colors">
+        Save   
+      </button>
+    </div>
+
+    <!-- Drawer Body -->
+    <div class="flex-1 p-6 space-y-6 overflow-y-auto">
+      <div>
+        <h2 class="text-lg font-serif font-bold text-white">Untitled</h2>   
+      </div>
+
+      <!-- Folder Selector -->
+      <div>
+        <label class="block text-xs font-semibold text-gray-400 uppercase mb-2">Folder</label>
+        <button type="button" class="bg-[#222] border border-[#3d3d3d] text-gray-200 px-3 py-1.5 text-xs rounded flex items-center space-x-2">
+          <span>📁 None</span>   
+        </button>
+      </div>
+
+      <!-- File Dropzone Box -->
+      <div>
+        <input type="file" #mediaFileInput (change)="onNewMediaFileSelected($event)" accept="image/*" class="hidden" />
+        
+        <div *ngIf="newMediaPreview; else dropzoneTemplate" class="w-full h-56 bg-black rounded border border-[#3d3d3d] relative overflow-hidden">
+          <img [src]="newMediaPreview" alt="Upload Preview" class="w-full h-full object-contain" />
+          <button (click)="newMediaPreview = null" class="absolute top-2 right-2 bg-rose-600 text-white p-1 rounded text-xs">Change</button>
+        </div>
+
+        <ng-template #dropzoneTemplate>
+          <div (click)="mediaFileInput.click()" class="border border-dashed border-[#3d3d3d] bg-[#161616] h-56 rounded flex flex-col items-center justify-center cursor-pointer hover:border-gray-400 transition-colors text-center p-4">
+            <div class="flex items-center space-x-3 mb-2">
+              <span class="bg-[#2a2a2a] text-gray-200 px-3 py-1.5 text-xs rounded border border-[#3d3d3d]">Select a file</span>   
+              <span class="text-xs text-gray-500">or</span>   
+              <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m6.75 12l-3-3m0 0l-3 3m3-3v6m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"></path>
+              </svg>
+            </div>
+            <span class="text-xs text-gray-500">or drag and drop a file</span>   
+          </div>
+        </ng-template>
+      </div>
+
+      <!-- Alt Field -->
+      <div>
+        <label class="block text-xs font-semibold text-gray-400 uppercase mb-2">
+          Alt <span class="text-rose-500">*</span>   
+        </label>
+        <input 
+          type="text" 
+          [formControl]="altControl"
+          class="w-full bg-[#161616] border border-[#2d2d2d] rounded px-4 py-2.5 text-xs text-white focus:outline-none focus:border-gray-500"
+        />
+      </div>
+
+      <!-- Tags Field -->
+      <div>
+        <label class="block text-xs font-semibold text-gray-400 uppercase mb-2">Tags</label>
+        <div class="relative">
+          <select class="w-full bg-[#161616] border border-[#2d2d2d] rounded px-4 py-2.5 text-xs text-white appearance-none focus:outline-none">
+            <option>Select a value</option>[cite: 15]
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ================= SIDE DRAWER: SELECT FROM EXISTING MEDIA ================= -->
+  <div *ngIf="activeDrawer === 'select-media'" class="w-full lg:w-[700px] bg-[#181818] border-l border-[#2d2d2d] flex flex-col h-screen fixed top-0 right-0 shadow-2xl z-50 animate-slide-in">
+    
+    <!-- Drawer Header -->
+    <div class="h-16 flex items-center justify-between px-6 border-b border-[#2d2d2d]">
+      <div class="flex items-center space-x-2 text-xs text-gray-400">
+        <button (click)="closeDrawer()" class="hover:text-white text-2xl">&lsaquo;</button>
+        <span class="text-white font-medium">Media</span> 
+      </div>
+      <!-- "Create New" button inside the Media selection drawer -->
+      <button 
+        type="button" 
+        (click)="openCreateMediaDrawer()"
+        class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-1.5 text-xs font-semibold uppercase rounded transition-colors">
+        Create New 
+      </button>
+    </div>
+
+    <!-- Search & Filters Bar -->
+    <div class="p-4 border-b border-[#2d2d2d] bg-[#161616] flex items-center justify-between gap-2">
+      <input type="text" placeholder="Search..." class="bg-[#121212] border border-[#2d2d2d] text-xs px-3 py-1.5 rounded text-white w-48 focus:outline-none" /> 
+      <div class="flex items-center space-x-2 text-xs text-gray-400">
+        <button class="bg-[#222] border border-[#3d3d3d] px-2.5 py-1.5 rounded">Filters</button> 
+        <button class="bg-[#222] border border-[#3d3d3d] px-2.5 py-1.5 rounded">Group by</button> 
+        <button class="bg-[#222] border border-[#3d3d3d] px-2.5 py-1.5 rounded">Columns</button> 
+      </div>
+    </div>
+
+    <!-- Media Table List -->
+    <div class="flex-1 overflow-y-auto">
+      <table class="w-full text-left text-xs">
+        <thead class="bg-[#161616] text-gray-400 uppercase tracking-wider border-b border-[#2d2d2d]">
+          <tr>
+            <th class="py-3 px-4">File Name</th>
+            <th class="py-3 px-4">Alt</th>
+            <th class="py-3 px-4">Folder</th>
+            <th class="py-3 px-4">Tags</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-[#2d2d2d]">
+          <tr 
+            *ngFor="let media of existingMediaItems" 
+            (click)="selectMedia(media)"
+            class="hover:bg-[#252525] cursor-pointer transition-colors">
+            <td class="py-3 px-4 flex items-center space-x-2">
+              <img [src]="media.url" class="w-8 h-8 object-cover rounded bg-black" />
+              <span class="text-white underline">{{ media.fileName }}</span> 
+            </td>
+            <td class="py-3 px-4 text-gray-300 truncate max-w-[150px]">{{ media.alt }}</td> 
+            <td class="py-3 px-4 text-gray-400">📁 {{ media.folder }}</td> 
+            <td class="py-3 px-4 text-gray-400">🏷️ {{ media.tags }}</td> 
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Drawer Footer Pagination -->
+    <div class="p-4 bg-[#161616] border-t border-[#2d2d2d] flex items-center justify-between text-xs text-gray-400">
+      <div>1-5 of {{ existingMediaItems.length }}</div> 
+      <div class="flex items-center space-x-2">
+        <span>Per page:</span> 
+        <select class="bg-[#1e1e1e] border border-[#2d2d2d] text-white px-2 py-1 rounded">
+          <option>5</option> 
+          <option>10</option>
+        </select>
+      </div>
+    </div>
+
+  </div>
+
+</div>

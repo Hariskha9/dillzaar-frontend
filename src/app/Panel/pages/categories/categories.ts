@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterLink, RouterModule } from '@angular/router';
 
 interface Category {
   id: number;
@@ -11,7 +11,7 @@ interface Category {
 
 @Component({
   selector: 'app-categories',
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, RouterLink],
   templateUrl: './categories.html',
   styleUrl: './categories.css',
 })
