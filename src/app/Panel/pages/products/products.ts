@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterLink, RouterModule } from '@angular/router';
 
 interface Product {
   id: number;
@@ -14,7 +14,7 @@ interface Product {
 
 @Component({
   selector: 'app-products',
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, RouterLink],
   templateUrl: './products.html',
   styleUrl: './products.css',
 })

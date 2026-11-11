@@ -9,6 +9,8 @@ import { Categories } from './Panel/pages/categories/categories';
 import { Order } from './Panel/pages/order/order';
 import { Users } from './Panel/pages/users/users';
 import { CategoryCreate } from './Panel/pages/categories/components/category-create/category-create';
+import { ProductCreate } from './Panel/pages/products/component/product-create/product-create';
+import { ProductEdit } from './Panel/pages/products/component/product-edit/product-edit';
 
 export const routes: Routes = [
      {
@@ -25,6 +27,8 @@ export const routes: Routes = [
     children: [
       { path: '', component: Dashbored },
       {path:'products', component:Products},
+      { path: 'products/:id/edit', component: ProductEdit },
+      { path: 'products/create', component: ProductCreate },
       {path:'categories', component:Categories},
       { path: 'categories/create', component: CategoryCreate },
       {path:'orders', component:Order},
