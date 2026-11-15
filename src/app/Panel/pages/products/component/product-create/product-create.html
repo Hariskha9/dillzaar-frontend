@@ -14,21 +14,27 @@
         <h1 class="text-3xl font-serif font-bold text-white tracking-wide">Create Product</h1>
       </div>
       <div>
-        <button 
-          type="button" 
-          (click)="onSave()"
-          class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 text-xs font-semibold tracking-wider uppercase transition-colors rounded">
-          Save Product
-        </button>
+       <button
+  type="button"
+  (click)="onSave()"
+  [disabled]="loading"
+  class="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white px-6 py-2 text-xs font-semibold uppercase rounded">
+
+  {{ loading ? 'Saving...' : 'Save Product' }}
+
+</button>
       </div>
     </div>
 
     <!-- 2-Column Form Layout -->
-    <form [formGroup]="productForm" (ngSubmit)="onSave()" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <form  [formGroup]="productForm" (ngSubmit)="onSave()" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       
       <!-- Left Column: General & Pricing & Gallery -->
       <div class="lg:col-span-2 space-y-6">
-        
+        <div *ngIf="errorMessage"
+  class="bg-red-950 text-red-400 border border-red-800 p-3 text-xs">
+  {{ errorMessage }}
+</div>  
         <!-- General Information Box -->
         <div class="bg-[#1e1e1e] border border-[#2d2d2d] p-6 rounded shadow-sm space-y-4">
           <h3 class="text-sm font-semibold text-white uppercase tracking-wider border-b border-[#2d2d2d] pb-3">General Information</h3>
@@ -61,11 +67,11 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-semibold text-gray-300 uppercase mb-2">Regular Price (PKR) *</label>
-              <input type="number" formControlName="regularPrice" class="w-full bg-[#161616] border border-[#2d2d2d] rounded px-4 py-2.5 text-xs text-white focus:outline-none" />
+              <input type="number" formControlName="regular_price" class="w-full bg-[#161616] border border-[#2d2d2d] rounded px-4 py-2.5 text-xs text-white focus:outline-none" />
             </div>
             <div>
               <label class="block text-xs font-semibold text-gray-300 uppercase mb-2">Sale Price (PKR)</label>
-              <input type="number" formControlName="salePrice" class="w-full bg-[#161616] border border-[#2d2d2d] rounded px-4 py-2.5 text-xs text-white focus:outline-none" />
+              <input type="number" formControlName="sale_price" class="w-full bg-[#161616] border border-[#2d2d2d] rounded px-4 py-2.5 text-xs text-white focus:outline-none" />
             </div>
           </div>
         </div>
@@ -100,7 +106,7 @@
         <div class="bg-[#1e1e1e] border border-[#2d2d2d] p-6 rounded shadow-sm space-y-4">
           <h3 class="text-sm font-semibold text-white uppercase tracking-wider border-b border-[#2d2d2d] pb-3">Publish</h3>
           <div class="flex items-center space-x-3">
-            <input type="checkbox" id="active" formControlName="active" class="w-4 h-4 rounded bg-[#161616] border-[#3d3d3d] text-blue-600" />
+            <input type="checkbox" id="active" formControlName="is_active" class="w-4 h-4 rounded bg-[#161616] border-[#3d3d3d] text-blue-600" />
             <label for="active" class="text-xs font-semibold text-gray-300 uppercase cursor-pointer">Active / Visible</label>
           </div>
         </div>
@@ -108,9 +114,16 @@
         <!-- Category Box -->
         <div class="bg-[#1e1e1e] border border-[#2d2d2d] p-6 rounded shadow-sm space-y-4">
           <h3 class="text-sm font-semibold text-white uppercase tracking-wider border-b border-[#2d2d2d] pb-3">Category</h3>
-          <select formControlName="category" class="w-full bg-[#161616] border border-[#2d2d2d] rounded px-4 py-2.5 text-xs text-white focus:outline-none">
-            <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
-          </select>
+          <select formControlName="category_id"
+  class="w-full bg-[#161616] border border-[#2d2d2d] rounded px-4 py-2.5 text-xs text-white">
+
+  <option [ngValue]="null">Select Category</option>
+
+  <option *ngFor="let cat of categories" [ngValue]="cat.id">
+    {{ cat.name }}
+  </option>
+
+</select>
         </div>
 
         <!-- Inventory Box -->
@@ -118,7 +131,7 @@
           <h3 class="text-sm font-semibold text-white uppercase tracking-wider border-b border-[#2d2d2d] pb-3">Inventory</h3>
           <div>
             <label class="block text-xs font-semibold text-gray-300 uppercase mb-2">Stock Quantity</label>
-            <input type="number" formControlName="stock" class="w-full bg-[#161616] border border-[#2d2d2d] rounded px-4 py-2.5 text-xs text-white focus:outline-none" />
+            <input type="number" formControlName="stock_quantity" class="w-full bg-[#161616] border border-[#2d2d2d] rounded px-4 py-2.5 text-xs text-white focus:outline-none" />
           </div>
         </div>
 
@@ -130,7 +143,7 @@
           <input type="file" #featuredDesktopInput (change)="onFeaturedDesktopFileSelected($event)" accept="image/*" class="hidden" />
 
           <!-- If image is selected -->
-          <div *ngIf="featuredImagePreview; else featuredPrompt" class="relative w-full h-44 bg-black rounded border border-[#3d3d3d] overflow-hidden group">
+          <div *ngIf="featuredImagePreview ; else featuredPrompt" class="relative w-full h-44 bg-black rounded border border-[#3d3d3d] overflow-hidden group">
             <img [src]="featuredImagePreview" class="w-full h-full object-cover" />
             <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
               <button type="button" (click)="removeFeaturedImage()" class="bg-rose-600 text-white px-3 py-1.5 rounded text-xs">Remove</button>
@@ -222,7 +235,7 @@
           <tr *ngFor="let media of existingMediaItems" (click)="selectExistingMedia(media)" class="hover:bg-[#252525] cursor-pointer transition-colors">
             <td class="py-3 px-4 flex items-center space-x-2">
               <img [src]="media.url" class="w-8 h-8 object-cover rounded bg-black" />
-              <span class="text-white underline">{{ media.fileName }}</span>
+              <!-- <span class="text-white underline">{{ media.fileName }}</span> -->
             </td>
             <td class="py-3 px-4 text-gray-300">{{ media.alt }}</td>
           </tr>

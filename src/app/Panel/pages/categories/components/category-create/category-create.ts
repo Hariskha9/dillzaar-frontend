@@ -1,47 +1,66 @@
-import { Component } from '@angular/core';
+
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+  FormControl,
+  FormsModule
+} from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
+
+import { Media } from '../../../../../core/services/media/media';
+import { CategoryPayload, CategoryService } from '../../../../../core/services/category/categoryservice';
 
 interface MediaItem {
   id: number;
-  fileName: string;
+  file_name: string;
+  file_path: string;
   alt: string;
   folder: string;
   tags: string;
   url: string;
 }
 
-
 @Component({
   selector: 'app-category-create',
-  imports: [CommonModule, ReactiveFormsModule, RouterModule,],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule , RouterModule],
   templateUrl: './category-create.html',
   styleUrl: './category-create.css',
 })
-export class CategoryCreate {
-categoryForm: FormGroup;
-  
-  // Drawer states: 'none' | 'create-media' | 'select-media'
+export class CategoryCreate implements OnInit {
+
+  categoryForm: FormGroup;
+
   activeDrawer: 'none' | 'create-media' | 'select-media' = 'none';
 
-  // Selected image preview for the category
+  // Selected image preview
   selectedImagePreview: string | null = null;
+  selectedMedia: MediaItem | null = null;
 
-  // New Media Form state
+  // Media Library
+  existingMediaItems: MediaItem[] = [];
+
+  // New Media Form
   newMediaForm: FormGroup;
   newMediaPreview: string | null = null;
+  newMediaFile: File | null = null;
 
-  // Existing Media Library Data matching your screenshot
-  existingMediaItems: MediaItem[] = [
-    { id: 1, fileName: 'zareen-formal-original.jpg', alt: 'Pakistani formal black embroidered ensemble', folder: 'None', tags: 'None', url: 'assets/images/zareen.webp' },
-    { id: 2, fileName: 'ready-to-wear-original.jpg', alt: 'Pakistani woman wearing a grey outfit and embroidered dupatta', folder: 'None', tags: 'None', url: 'assets/images/ready-to-wear.webp' },
-    { id: 3, fileName: 'sahar-original.jpg', alt: 'Pakistani woman in a beige embroidered outfit and pink dupatta', folder: 'None', tags: 'None', url: 'assets/images/sahar.webp' },
-    { id: 4, fileName: 'mehr-un-nisa-original.jpg', alt: 'Pakistani woman in grey embroidered three piece suit', folder: 'None', tags: 'None', url: 'assets/images/mehr-un-nisa.webp' },
-    { id: 5, fileName: 'luxury-lawn-original.jpg', alt: 'Pakistani woman styling a green outfit with white dupatta', folder: 'None', tags: 'None', url: 'assets/images/luxury-lawn.webp' }
-  ];
+  uploadingMedia = false;
+  loadingMedia = false;
+  mediaError = '';
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  // Change this to your production storage URL when deploying.
+  private storageUrl = 'http://127.0.0.1:8000/storage';
+
+  constructor(
+      private fb: FormBuilder,
+  private router: Router,
+  private mediaService: Media,
+  private categoryService: CategoryService
+  ) {
     this.categoryForm = this.fb.group({
       name: ['', Validators.required],
       slug: ['', Validators.required],
@@ -57,72 +76,221 @@ categoryForm: FormGroup;
     });
   }
 
-  // Add this getter inside your CategoryCreateComponent class
-get altControl(): FormControl {
-  return this.newMediaForm.get('alt') as FormControl;
-}
+  ngOnInit(): void {
+    this.loadMedia();
+  }
 
-  // Open Drawers
-  openCreateMediaDrawer() {
+  get altControl(): FormControl {
+    return this.newMediaForm.get('alt') as FormControl;
+  }
+
+  // Load media from Laravel database
+  loadMedia(): void {
+    this.loadingMedia = true;
+
+    this.mediaService.getMedia().subscribe({
+      next: (response: any) => {
+        const result = response.data;
+
+        const items = Array.isArray(result)
+          ? result
+          : Array.isArray(result?.data)
+            ? result.data
+            : [];
+
+        this.existingMediaItems = items.map((item: any) =>
+          this.formatMedia(item)
+        );
+
+        this.loadingMedia = false;
+      },
+      error: (error: any) => {
+        console.error('Media loading failed:', error);
+        this.mediaError = 'Unable to load media library.';
+        this.loadingMedia = false;
+      }
+    });
+  }
+
+  // Normalize Laravel media response
+  private formatMedia(item: any): MediaItem {
+    return {
+      id: item.id,
+      file_name: item.file_name || item.fileName || '',
+      file_path: item.file_path || '',
+      alt: item.alt || '',
+      folder: item.folder || 'None',
+      tags: item.tags || 'None',
+      url: item.url || this.getMediaUrl(item.file_path)
+    };
+  }
+
+  // Generate URL if API doesn't return one
+  getMediaUrl(path: string): string {
+    if (!path) return '';
+
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+      return path;
+    }
+
+    return `${this.storageUrl}/${path.replace(/^\/+/, '')}`;
+  }
+
+  // Open drawers
+  openCreateMediaDrawer(): void {
     this.activeDrawer = 'create-media';
-    this.newMediaForm.reset({ folder: 'None', tags: 'None' });
+
+    this.newMediaForm.reset({
+      folder: 'None',
+      alt: '',
+      tags: 'None'
+    });
+
     this.newMediaPreview = null;
+    this.newMediaFile = null;
+    this.mediaError = '';
   }
 
-  openSelectMediaDrawer() {
+  openSelectMediaDrawer(): void {
     this.activeDrawer = 'select-media';
+    this.loadMedia();
   }
 
-  closeDrawer() {
+  closeDrawer(): void {
     this.activeDrawer = 'none';
   }
 
-  // Handle file selection in Create New Media drawer
-  onNewMediaFileSelected(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.newMediaPreview = reader.result as string;
-      };
-      reader.readAsDataURL(file);
+  // Select image file
+  onNewMediaFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      this.mediaError = 'Please select a valid image.';
+      input.value = '';
+      return;
     }
+
+    this.newMediaFile = file;
+    this.mediaError = '';
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      this.newMediaPreview = reader.result as string;
+    };
+
+    reader.readAsDataURL(file);
   }
 
-  // Save new media item and attach it to category
-  saveNewMedia() {
-    if (this.newMediaForm.valid && this.newMediaPreview) {
-      const newMedia: MediaItem = {
-        id: this.existingMediaItems.length + 1,
-        fileName: 'custom-upload-' + Date.now() + '.jpg',
-        alt: this.newMediaForm.value.alt,
-        folder: this.newMediaForm.value.folder,
-        tags: this.newMediaForm.value.tags,
-        url: this.newMediaPreview
-      };
-      this.existingMediaItems.unshift(newMedia);
-      this.selectMedia(newMedia);
+  // Upload image to Laravel Media API
+  saveNewMedia(): void {
+    if (!this.newMediaFile) {
+      this.mediaError = 'Please select an image first.';
+      return;
     }
+
+    if (this.newMediaForm.invalid) {
+      this.newMediaForm.markAllAsTouched();
+      return;
+    }
+
+    const formData = new FormData();
+
+    formData.append('file', this.newMediaFile);
+    formData.append('alt', this.newMediaForm.value.alt);
+    formData.append('folder', this.newMediaForm.value.folder || 'None');
+
+    this.uploadingMedia = true;
+    this.mediaError = '';
+
+    this.mediaService.uploadMedia(formData).subscribe({
+      next: (response: any) => {
+        // Supports {data: media} and {data: {data: media}}
+        const uploaded = response.data?.data || response.data;
+
+        if (!uploaded?.id) {
+          this.mediaError = 'Upload succeeded but media details were not returned.';
+          this.uploadingMedia = false;
+          return;
+        }
+
+        const media = this.formatMedia(uploaded);
+
+        // Add uploaded image to Media Library
+        this.existingMediaItems.unshift(media);
+
+        // Automatically select uploaded image
+        this.selectMedia(media);
+
+        this.uploadingMedia = false;
+        this.newMediaFile = null;
+        this.newMediaPreview = null;
+      },
+      error: (error: any) => {
+        console.error('Media upload failed:', error);
+
+        this.mediaError =
+          error.error?.message || 'Image upload failed. Please try again.';
+
+        this.uploadingMedia = false;
+      }
+    });
   }
 
-  // Select an item from the existing media list
-  selectMedia(media: MediaItem) {
+  // Select existing or newly uploaded media
+  selectMedia(media: MediaItem): void {
+    this.selectedMedia = media;
     this.selectedImagePreview = media.url;
-    this.categoryForm.patchValue({ image: media.url });
+
+    // Preview only. This value is not submitted when creating category.
+    this.categoryForm.patchValue({
+      image: media.url
+    });
+
     this.closeDrawer();
   }
 
-  removeSelectedImage() {
+  // Remove selected preview
+  removeSelectedImage(): void {
     this.selectedImagePreview = null;
-    this.categoryForm.patchValue({ image: null });
+    this.selectedMedia = null;
+
+    this.categoryForm.patchValue({
+      image: null
+    });
   }
 
-  onSaveCategory() {
-    if (this.categoryForm.valid) {
-      console.log('Category Saved:', this.categoryForm.value);
-      this.router.navigate(['/admin/categories']);
-    } else {
-      this.categoryForm.markAllAsTouched();
-    }
+  // Save category without image
+ onSaveCategory(): void {
+  if (this.categoryForm.invalid) {
+    this.categoryForm.markAllAsTouched();
+    return;
   }
+
+  const payload: CategoryPayload = {
+    name: this.categoryForm.value.name,
+    slug: this.categoryForm.value.slug,
+    image: this.categoryForm.value.image,
+    description: this.categoryForm.value.description,
+    is_active: true
+  };
+
+  this.categoryService.createCategory(payload).subscribe({
+    next: (response) => {
+      console.log('Category created successfully:', response);
+
+      this.router.navigate(['/admin/categories']);
+    },
+    error: (error) => {
+      console.error('Category creation failed:', error);
+
+      if (error.error?.errors) {
+        console.log('Validation errors:', error.error.errors);
+      }
+    }
+  });
+}
 }

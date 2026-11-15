@@ -1,155 +1,538 @@
-import { Component } from '@angular/core';
+
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormsModule } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+  FormsModule
+} from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
+
+
+import { Product } from '../../../../../core/services/product/product';
+import { Media } from '../../../../../core/services/media/media';
 
 interface MediaItem {
   id: number;
-  fileName: string;
+  file_name: string;
+  file_path: string;
   alt: string;
   url: string;
 }
 
 @Component({
   selector: 'app-product-create',
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, FormsModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterModule,
+    FormsModule
+  ],
   templateUrl: './product-create.html',
   styleUrl: './product-create.css',
 })
-export class ProductCreate {
-productForm: FormGroup;
-  
-  // Featured Image State
+export class ProductCreate implements OnInit {
+
+  productForm: FormGroup;
+
+  loading = false;
+  mediaLoading = false;
+
+  errorMessage = '';
+  successMessage = '';
+
+  // Featured image
   featuredImagePreview: string | null = null;
+  featuredImagePath: string | null = null;
+  featuredMediaId: number | null = null;
 
-  // Gallery Images State
+  // Gallery
   galleryImages: string[] = [];
+  galleryPaths: string[] = [];
+  galleryMediaIds: number[] = [];
 
-  // Drawer Control: 'none' | 'create-media' | 'select-media' | 'select-featured'
-  activeDrawer: 'none' | 'create-media' | 'select-media' | 'select-featured' = 'none';
+  // Drawer
+  activeDrawer: 'none' | 'create-media' | 'select-media' = 'none';
+
   targetForMedia: 'featured' | 'gallery' = 'gallery';
 
+  // New media
+  newMediaFile: File | null = null;
   newMediaPreview: string | null = null;
   newMediaAlt = '';
 
-  categories = ['Luxury Lawn', 'Festive Formals', 'Ready to Wear'];
+  // Media library
+  existingMediaItems: MediaItem[] = [];
 
-  // Mock Existing Media Library
-  existingMediaItems: MediaItem[] = [
-    { id: 1, fileName: 'zareen-formal-original.jpg', alt: 'Pakistani formal black embroidered ensemble', url: 'assets/images/zareen.webp' },
-    { id: 2, fileName: 'ready-to-wear-original.jpg', alt: 'Pakistani woman wearing a grey outfit', url: 'assets/images/ready-to-wear.webp' },
-    { id: 3, fileName: 'sahar-original.jpg', alt: 'Pakistani woman in a beige outfit', url: 'assets/images/sahar.webp' },
-    { id: 4, fileName: 'mehr-un-nisa-original.jpg', alt: 'Pakistani woman in grey embroidered suit', url: 'assets/images/mehr-un-nisa.webp' },
-    { id: 5, fileName: 'luxury-lawn-original.jpg', alt: 'Pakistani woman styling a green outfit', url: 'assets/images/luxury-lawn.webp' }
-  ];
+  // Categories must contain IDs from your categories table.
+  categories: { id: number; name: string }[] = [];
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private productService: Product,
+    private mediaService: Media
+  ) {
+
     this.productForm = this.fb.group({
+
       name: ['', Validators.required],
-      slug: ['', Validators.required],
+
+      slug: [''],
+
       sku: ['', Validators.required],
-      regularPrice: ['', [Validators.required, Validators.min(0)]],
-      salePrice: ['', Validators.min(0)],
-      stock: [1, [Validators.required, Validators.min(0)]],
-      category: ['Luxury Lawn', Validators.required],
+
+      regular_price: ['', [
+        Validators.required,
+        Validators.min(0)
+      ]],
+
+      sale_price: ['', [
+        Validators.min(0)
+      ]],
+
+      stock_quantity: [1, [
+        Validators.required,
+        Validators.min(0)
+      ]],
+
+      category_id: [null],
+
       description: [''],
-      active: [true]
+
+      is_active: [true]
+
     });
+
   }
 
-  // --- Featured Image Triggers ---
-  openFeaturedMediaDrawer() {
-    this.targetForMedia = 'featured';
-    this.activeDrawer = 'select-media';
+  ngOnInit(): void {
+
+    this.loadMedia();
+
+    // Automatically generate slug
+    this.productForm.get('name')?.valueChanges.subscribe(name => {
+
+      const slug = this.generateSlug(name || '');
+
+      this.productForm.patchValue(
+        { slug },
+        { emitEvent: false }
+      );
+
+    });
+
   }
 
-  // Direct Desktop Upload for Featured Image
-  onFeaturedDesktopFileSelected(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.featuredImagePreview = reader.result as string;
-      };
-      reader.readAsDataURL(file);
-    }
+  // ---------------------------------
+  // SLUG GENERATOR
+  // ---------------------------------
+
+  generateSlug(name: string): string {
+
+    return name
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '');
+
   }
 
-  removeFeaturedImage() {
-    this.featuredImagePreview = null;
-  }
+  // ---------------------------------
+  // LOAD MEDIA LIBRARY
+  // ---------------------------------
 
-  // --- Gallery Image Triggers ---
-  openGalleryMediaDrawer() {
-    this.targetForMedia = 'gallery';
-    this.activeDrawer = 'select-media';
-  }
+  loadMedia(): void {
 
-  // --- Drawer Management ---
-  openCreateMediaDrawer() {
-    this.activeDrawer = 'create-media';
-    this.newMediaPreview = null;
-    this.newMediaAlt = '';
-  }
+    this.mediaLoading = true;
 
-  closeDrawer() {
-    this.activeDrawer = 'none';
-  }
+    this.mediaService.getMedia().subscribe({
 
-  onDrawerFileSelected(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.newMediaPreview = reader.result as string;
-      };
-      reader.readAsDataURL(file);
-    }
-  }
+      next: (response: any) => {
 
-  saveNewMedia() {
-    if (this.newMediaPreview) {
-      const newMedia: MediaItem = {
-        id: this.existingMediaItems.length + 1,
-        fileName: 'upload-' + Date.now() + '.jpg',
-        alt: this.newMediaAlt || 'Product image',
-        url: this.newMediaPreview
-      };
-      this.existingMediaItems.unshift(newMedia);
-      this.assignMedia(newMedia.url);
-    }
-  }
+        const result = response.data;
 
-  selectExistingMedia(media: MediaItem) {
-    this.assignMedia(media.url);
-  }
+        this.existingMediaItems = Array.isArray(result)
+          ? result
+          : result?.data || [];
 
-  assignMedia(url: string) {
-    if (this.targetForMedia === 'featured') {
-      this.featuredImagePreview = url;
-    } else {
-      if (!this.galleryImages.includes(url)) {
-        this.galleryImages.push(url);
+        this.mediaLoading = false;
+
+      },
+
+      error: (error: any) => {
+
+        console.error('Media loading error:', error);
+
+        this.mediaLoading = false;
+
       }
-    }
-    this.closeDrawer();
+
+    });
+
   }
 
-  removeGalleryImage(index: number) {
+  // ---------------------------------
+  // IMAGE URL
+  // ---------------------------------
+
+  getMediaUrl(path: string): string {
+
+    if (!path) return '';
+
+    if (path.startsWith('http')) {
+      return path;
+    }
+
+    return `http://127.0.0.1:8000/storage/${path}`;
+
+  }
+
+  // ---------------------------------
+  // FEATURED IMAGE
+  // ---------------------------------
+
+  openFeaturedMediaDrawer(): void {
+
+    this.targetForMedia = 'featured';
+
+    this.activeDrawer = 'select-media';
+
+    this.loadMedia();
+
+  }
+
+  onFeaturedDesktopFileSelected(event: Event): void {
+
+    const input = event.target as HTMLInputElement;
+
+    const file = input.files?.[0];
+
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      this.errorMessage = 'Please select an image file.';
+      input.value = '';
+      return;
+    }
+
+    this.uploadImageToMedia(file, 'featured');
+
+    input.value = '';
+
+  }
+
+  removeFeaturedImage(): void {
+
+    this.featuredImagePreview = null;
+
+    this.featuredImagePath = null;
+
+    this.featuredMediaId = null;
+
+  }
+
+  // ---------------------------------
+  // GALLERY
+  // ---------------------------------
+
+  openGalleryMediaDrawer(): void {
+
+    this.targetForMedia = 'gallery';
+
+    this.activeDrawer = 'select-media';
+
+    this.loadMedia();
+
+  }
+
+  removeGalleryImage(index: number): void {
+
     this.galleryImages.splice(index, 1);
+
+    this.galleryPaths.splice(index, 1);
+
+    this.galleryMediaIds.splice(index, 1);
+
   }
 
-  onSave() {
-    if (this.productForm.valid) {
-      const formData = {
-        ...this.productForm.value,
-        featuredImage: this.featuredImagePreview,
-        gallery: this.galleryImages
-      };
-      console.log('Product Saved:', formData);
-      this.router.navigate(['/admin/products']);
-    } else {
-      this.productForm.markAllAsTouched();
-    }
+  // ---------------------------------
+  // DRAWER
+  // ---------------------------------
+
+  openCreateMediaDrawer(): void {
+
+    this.activeDrawer = 'create-media';
+
+    this.newMediaPreview = null;
+
+    this.newMediaFile = null;
+
+    this.newMediaAlt = '';
+
   }
+
+  closeDrawer(): void {
+
+    this.activeDrawer = 'none';
+
+  }
+
+  onDrawerFileSelected(event: Event): void {
+
+    const input = event.target as HTMLInputElement;
+
+    const file = input.files?.[0];
+
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      this.errorMessage = 'Please select an image file.';
+      input.value = '';
+      return;
+    }
+
+    this.newMediaFile = file;
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+
+      this.newMediaPreview = reader.result as string;
+
+    };
+
+    reader.readAsDataURL(file);
+
+  }
+
+  // ---------------------------------
+  // UPLOAD NEW MEDIA
+  // ---------------------------------
+
+  uploadImageToMedia(
+    file: File,
+    target: 'featured' | 'gallery'
+  ): void {
+
+    const formData = new FormData();
+
+    formData.append('file', file);
+
+    formData.append(
+      'alt',
+      this.newMediaAlt || file.name.replace(/\.[^/.]+$/, '')
+    );
+
+    formData.append('folder', 'products');
+
+    this.loading = true;
+
+    this.mediaService.uploadMedia(formData).subscribe({
+
+      next: (response: any) => {
+
+        const media = response.data;
+
+        this.assignMedia(media);
+
+        this.loading = false;
+
+        this.newMediaFile = null;
+
+        this.newMediaPreview = null;
+
+        this.newMediaAlt = '';
+
+        this.activeDrawer = 'none';
+
+      },
+
+      error: (error: any) => {
+
+        console.error('Media upload error:', error);
+
+        this.errorMessage =
+          error.error?.message || 'Unable to upload image.';
+
+        this.loading = false;
+
+      }
+
+    });
+
+  }
+
+  // Save image from Create Media drawer
+  saveNewMedia(): void {
+
+    if (!this.newMediaFile) {
+
+      this.errorMessage = 'Please select an image first.';
+
+      return;
+
+    }
+
+    if (!this.newMediaAlt.trim()) {
+
+      this.errorMessage = 'Please enter image alt text.';
+
+      return;
+
+    }
+
+    this.uploadImageToMedia(
+      this.newMediaFile,
+      this.targetForMedia
+    );
+
+  }
+
+  // ---------------------------------
+  // SELECT EXISTING MEDIA
+  // ---------------------------------
+
+  selectExistingMedia(media: MediaItem): void {
+
+    this.assignMedia(media);
+
+    this.closeDrawer();
+
+  }
+
+  // ---------------------------------
+  // ASSIGN MEDIA TO PRODUCT
+  // ---------------------------------
+
+  assignMedia(media: MediaItem): void {
+
+    const path = media.file_path;
+
+    const url = media.url || this.getMediaUrl(path);
+
+    if (!path) {
+
+      this.errorMessage = 'Media file path is missing.';
+
+      return;
+
+    }
+
+    if (this.targetForMedia === 'featured') {
+
+      this.featuredImagePreview = url;
+
+      this.featuredImagePath = path;
+
+      this.featuredMediaId = media.id;
+
+    } else {
+
+      if (!this.galleryPaths.includes(path)) {
+
+        this.galleryImages.push(url);
+
+        this.galleryPaths.push(path);
+
+        this.galleryMediaIds.push(media.id);
+
+      }
+
+    }
+
+  }
+
+  // ---------------------------------
+  // SAVE PRODUCT
+  // ---------------------------------
+
+  
+onSave(): void {
+
+  this.errorMessage = '';
+
+  if (this.productForm.invalid) {
+    this.productForm.markAllAsTouched();
+    return;
+  }
+
+  if (this.loading) return;
+
+  const formValue = this.productForm.value;
+
+  const formData = new FormData();
+
+  formData.append('name', formValue.name);
+  formData.append('slug', formValue.slug || '');
+  formData.append('sku', formValue.sku);
+  formData.append('description', formValue.description || '');
+
+  formData.append(
+    'category_id',
+    formValue.category_id || ''
+  );
+
+  formData.append(
+    'regular_price',
+    formValue.regular_price
+  );
+
+  formData.append(
+    'sale_price',
+    formValue.sale_price || ''
+  );
+
+  formData.append(
+    'stock_quantity',
+    formValue.stock_quantity
+  );
+
+  formData.append(
+    'is_active',
+    formValue.is_active ? '1' : '0'
+  );
+
+  // Send existing media paths, not image files
+  if (this.featuredImagePath) {
+    formData.append(
+      'featured_image',
+      this.featuredImagePath
+    );
+  }
+
+  this.galleryPaths.forEach((path, index) => {
+    formData.append(`gallery_images[${index}]`, path);
+  });
+
+  this.loading = true;
+
+  this.productService.createProduct(formData).subscribe({
+
+    next: (response: any) => {
+
+      this.loading = false;
+
+      this.router.navigate(['/admin/products']);
+
+    },
+
+    error: (error: any) => {
+
+      console.error('Product save error:', error);
+
+      this.loading = false;
+
+      this.errorMessage =
+        error.error?.message || 'Unable to save product.';
+
+    }
+
+  });
+
+}
+
+
 }

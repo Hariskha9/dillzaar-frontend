@@ -109,7 +109,7 @@
         <div class="bg-[#1e1e1e] border border-[#2d2d2d] p-6 rounded shadow-sm space-y-4">
           <h3 class="text-sm font-semibold text-white uppercase tracking-wider border-b border-[#2d2d2d] pb-3">Category</h3>
           <select formControlName="category" class="w-full bg-[#161616] border border-[#2d2d2d] rounded px-4 py-2.5 text-xs text-white focus:outline-none">
-            <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+            <option *ngFor="let cat of categories" [value]="cat">{{ cat.name }}</option>
           </select>
         </div>
 

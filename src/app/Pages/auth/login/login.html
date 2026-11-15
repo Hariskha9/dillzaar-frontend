@@ -69,11 +69,22 @@
         </div>
       </div>
 
+        @if (errorMessage) {
+        <div class="text-red-500 text-[10px] mt-1 tracking-wider">
+          {{ errorMessage }}
+        </div>
+      }
+
       <!-- Submit Button -->
       <button 
         type="submit" 
+        [disabled]="loading"
         class="w-full h-12 bg-black text-white hover:bg-neutral-800 transition-colors text-xs font-semibold tracking-[0.2em] uppercase rounded-none mt-2">
-        Sign In
+          @if (loading) {
+          Signing in...
+        } @else {
+          Sign In
+        }
       </button>
 
     </form>

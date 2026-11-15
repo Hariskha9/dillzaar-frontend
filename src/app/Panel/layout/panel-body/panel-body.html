@@ -37,13 +37,16 @@
 
       <!-- User Profile Action -->
       <div class="flex items-center space-x-4">
+         @if (user$ | async; as user) {
         <div class="text-xs text-right">
-          <span class="block font-medium text-gray-200">Store Admin</span>
-          <span class="text-gray-400 text-[10px]">admin@zarqash.com</span>
+          <span class="block font-medium text-gray-200">{{ user.name }}</span>
+          <span class="text-gray-400 text-[10px]">{{ user.email }}</span>
+          
         </div>
         <div class="w-9 h-9 rounded-full bg-neutral-700 flex items-center justify-center text-white font-semibold text-sm">
-          ZA
+          {{ user.name[0] }}
         </div>
+      }
       </div>
     </header>
 

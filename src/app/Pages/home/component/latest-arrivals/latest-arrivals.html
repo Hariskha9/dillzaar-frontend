@@ -1,0 +1,87 @@
+
+<section class="bg-[#f6f5f2] py-16 px-4 sm:px-8 lg:px-12 font-sans text-[#1a1a1a]">
+
+  <div class="max-w-7xl mx-auto">
+
+    <!-- Section Header -->
+    <div class="text-center mb-12">
+
+      <p class="text-[10px] tracking-[0.25em] uppercase text-gray-500 mb-2">
+        New Season &bull;
+      </p>
+
+      <h2 class="text-3xl sm:text-4xl font-serif font-normal text-[#111] tracking-tight">
+        The latest arrivals
+      </h2>
+
+    </div>
+
+    <!-- Loading -->
+    <div
+      *ngIf="loading"
+      class="py-12 text-center text-sm text-gray-500">
+
+      Loading latest arrivals...
+
+    </div>
+
+    <!-- Error -->
+    <div
+      *ngIf="!loading && errorMessage"
+      class="py-8 text-center text-sm text-red-600">
+
+      {{ errorMessage }}
+
+      <button
+        type="button"
+        (click)="loadLatestProducts()"
+        class="ml-2 underline">
+
+        Try again
+
+      </button>
+
+    </div>
+
+    <!-- Products Grid -->
+    <div
+      *ngIf="!loading && !errorMessage && products.length > 0"
+      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-x-6 gap-y-12">
+
+      <app-product-card
+        *ngFor="let item of products"
+        [product]="item"
+        (wishlistToggle)="handleWishlist($event)"
+        (quickAddClick)="handleQuickAdd($event)">
+
+      </app-product-card>
+
+    </div>
+
+    <!-- Empty State -->
+    <div
+      *ngIf="!loading && !errorMessage && products.length === 0"
+      class="py-12 text-center text-sm text-gray-500">
+
+      No products available right now.
+
+    </div>
+
+    <!-- Bottom CTA -->
+    <div class="mt-14 text-center">
+
+      <a
+        routerLink="/collections/all"
+        class="inline-flex items-center space-x-3 bg-[#141414] hover:bg-[#2a2a2a] text-white px-7 py-3.5 text-[10px] font-semibold tracking-[0.2em] uppercase transition-colors">
+
+        <span>View All Products</span>
+
+        <span aria-hidden="true">&rarr;</span>
+
+      </a>
+
+    </div>
+
+  </div>
+
+</section>

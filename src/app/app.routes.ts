@@ -11,6 +11,11 @@ import { Users } from './Panel/pages/users/users';
 import { CategoryCreate } from './Panel/pages/categories/components/category-create/category-create';
 import { ProductCreate } from './Panel/pages/products/component/product-create/product-create';
 import { ProductEdit } from './Panel/pages/products/component/product-edit/product-edit';
+import { authGuard } from './core/guards/auth/auth-guard';
+import { roleGuard } from './core/guards/role/role-guard';
+import { guestGuard } from './core/guards/guest/guest-guard';
+import { CategoryEdit } from './Panel/pages/categories/components/category-edit/category-edit';
+import { ProductDetail } from './Pages/product-detail/product-detail';
 
 export const routes: Routes = [
      {
@@ -18,19 +23,37 @@ export const routes: Routes = [
     component: Body,
     children: [
       { path: '', component: Home },
-      {path:'account', component: Login}
+       { path: 'product/:slug', component: ProductDetail },
+      {path:'login', component: Login,  canActivate: [guestGuard],}
     ]
   },
   {
     path: 'panel',
     component: PanelBody,
+    canActivate: [authGuard],
     children: [
-      { path: '', component: Dashbored },
+      { path: '', component: Dashbored, 
+                canActivate: [roleGuard],
+                data: {
+          roles: [
+            'super_admin',
+            'admin',
+            'employee',
+            'client'
+          ]
+        }
+
+      },
+
       {path:'products', component:Products},
       { path: 'products/:id/edit', component: ProductEdit },
       { path: 'products/create', component: ProductCreate },
       {path:'categories', component:Categories},
       { path: 'categories/create', component: CategoryCreate },
+      {
+  path: 'categories/edit/:id',
+  component: CategoryEdit
+ },
       {path:'orders', component:Order},
       {path:'users', component:Users},
 

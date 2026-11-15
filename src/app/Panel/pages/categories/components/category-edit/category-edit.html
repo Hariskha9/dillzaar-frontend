@@ -1,0 +1,199 @@
+
+<div class="min-h-screen bg-[#111111] p-6 text-white">
+
+  <!-- Header -->
+  <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <div class="mb-2 flex items-center gap-2 text-sm text-gray-400">
+        <a routerLink="/panel/categories" class="hover:text-white">
+          Categories
+        </a>
+        <span>/</span>
+        <span class="text-white">Edit Category</span>
+      </div>
+
+      <h1 class="text-2xl font-semibold">Edit Category</h1>
+      <p class="mt-1 text-sm text-gray-400">
+        Update your category information.
+      </p>
+    </div>
+
+    <button
+      type="button"
+      (click)="cancel()"
+      class="rounded border border-[#333333] px-4 py-2 text-sm text-gray-300 hover:bg-[#252525]">
+      Back to Categories
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div
+    *ngIf="loading"
+    class="rounded-lg border border-[#2d2d2d] bg-[#1e1e1e] p-8 text-center text-gray-400">
+    Loading category...
+  </div>
+
+  <ng-container *ngIf="!loading">
+
+    <!-- Error -->
+    <div
+      *ngIf="errorMessage"
+      class="mb-5 rounded border border-red-800 bg-red-950/40 p-4 text-sm text-red-300">
+      {{ errorMessage }}
+    </div>
+
+    <!-- Success -->
+    <div
+      *ngIf="successMessage"
+      class="mb-5 rounded border border-green-800 bg-green-950/40 p-4 text-sm text-green-300">
+      {{ successMessage }}
+    </div>
+
+    <form
+      [formGroup]="categoryForm"
+      (ngSubmit)="updateCategory()"
+      class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+
+      <!-- Main Information -->
+      <div class="space-y-5 lg:col-span-2">
+
+        <div class="rounded-lg border border-[#2d2d2d] bg-[#1e1e1e] p-6">
+          <h2 class="mb-5 border-b border-[#333333] pb-3 text-sm font-semibold uppercase tracking-wider">
+            Category Information
+          </h2>
+
+          <!-- Name -->
+          <div class="mb-5">
+            <label class="mb-2 block text-sm font-medium text-gray-300">
+              Category Name <span class="text-red-400">*</span>
+            </label>
+
+            <input
+              type="text"
+              formControlName="name"
+              placeholder="Enter category name"
+              class="w-full rounded border border-[#383838] bg-[#151515] px-4 py-3 text-sm text-white outline-none focus:border-blue-500">
+
+            <p
+              *ngIf="categoryForm.get('name')?.touched && categoryForm.get('name')?.invalid"
+              class="mt-1 text-xs text-red-400">
+              Category name is required.
+            </p>
+          </div>
+
+          <!-- Slug -->
+          <div class="mb-5">
+            <label class="mb-2 block text-sm font-medium text-gray-300">
+              Slug <span class="text-red-400">*</span>
+            </label>
+
+            <input
+              type="text"
+              formControlName="slug"
+              placeholder="category-slug"
+              class="w-full rounded border border-[#383838] bg-[#151515] px-4 py-3 text-sm text-white outline-none focus:border-blue-500">
+
+            <p
+              *ngIf="categoryForm.get('slug')?.touched && categoryForm.get('slug')?.invalid"
+              class="mt-1 text-xs text-red-400">
+              Slug is required.
+            </p>
+          </div>
+
+          <!-- Description -->
+          <div>
+            <label class="mb-2 block text-sm font-medium text-gray-300">
+              Description
+            </label>
+
+            <textarea
+              rows="5"
+              formControlName="description"
+              placeholder="Enter category description"
+              class="w-full resize-y rounded border border-[#383838] bg-[#151515] px-4 py-3 text-sm text-white outline-none focus:border-blue-500"></textarea>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Sidebar -->
+      <div class="space-y-5">
+
+        <!-- Category Image -->
+        <div class="rounded-lg border border-[#2d2d2d] bg-[#1e1e1e] p-6">
+          <h2 class="mb-5 border-b border-[#333333] pb-3 text-sm font-semibold uppercase tracking-wider">
+            Category Image
+          </h2>
+
+          <div
+            class="mb-4 flex min-h-40 items-center justify-center overflow-hidden rounded border border-dashed border-[#444444] bg-[#151515] p-3">
+
+            <img
+              *ngIf="imageUrl"
+              [src]="imageUrl"
+              alt="Category image preview"
+              class="max-h-48 max-w-full object-contain">
+
+            <p *ngIf="!imageUrl" class="text-sm text-gray-500">
+              No image selected
+            </p>
+          </div>
+
+          <label class="mb-2 block text-sm font-medium text-gray-300">
+            Image URL
+          </label>
+
+          <input
+            type="text"
+            formControlName="image"
+            placeholder="https://example.com/image.webp"
+            class="w-full rounded border border-[#383838] bg-[#151515] px-3 py-2 text-sm text-white outline-none focus:border-blue-500">
+
+          <p class="mt-2 text-xs text-gray-500">
+            Paste the image URL from your media library.
+          </p>
+        </div>
+
+        <!-- Status -->
+        <div class="rounded-lg border border-[#2d2d2d] bg-[#1e1e1e] p-6">
+          <h2 class="mb-5 border-b border-[#333333] pb-3 text-sm font-semibold uppercase tracking-wider">
+            Category Status
+          </h2>
+
+          <label class="flex cursor-pointer items-center justify-between gap-3">
+            <div>
+              <p class="text-sm font-medium text-white">Active Category</p>
+              <p class="mt-1 text-xs text-gray-500">
+                Enable or disable this category.
+              </p>
+            </div>
+
+            <input
+              type="checkbox"
+              formControlName="is_active"
+              class="h-5 w-5 accent-blue-500">
+          </label>
+        </div>
+
+      </div>
+
+      <!-- Form Actions -->
+      <div class="flex flex-wrap justify-end gap-3 lg:col-span-3">
+        <button
+          type="button"
+          (click)="cancel()"
+          class="rounded border border-[#383838] px-5 py-2.5 text-sm text-gray-300 hover:bg-[#252525]">
+          Cancel
+        </button>
+
+        <button
+          type="submit"
+          [disabled]="saving || categoryForm.invalid"
+          class="rounded bg-blue-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">
+          {{ saving ? 'Updating...' : 'Update Category' }}
+        </button>
+      </div>
+
+    </form>
+  </ng-container>
+</div>

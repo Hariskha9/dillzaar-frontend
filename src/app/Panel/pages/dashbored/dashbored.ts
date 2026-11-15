@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
+
 @Component({
   selector: 'app-dashbored',
   imports: [CommonModule, RouterModule],
@@ -22,4 +23,6 @@ export class Dashbored {
     { id: '#ZQ-8490', customer: 'Zainab Ahmed', product: 'Ready to Wear - Grey', amount: 'PKR 9,500', status: 'Shipped' },
     { id: '#ZQ-8489', customer: 'Usman Tariq', product: 'Luxury Lawn - Crimson', amount: 'PKR 15,200', status: 'Pending' }
   ];
+
+
 }
