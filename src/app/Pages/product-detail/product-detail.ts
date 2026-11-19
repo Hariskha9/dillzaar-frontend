@@ -106,54 +106,129 @@ export class ProductDetail implements OnInit {
   }
 
   // Get all product images
+  // get productImages(): string[] {
+  //   if (!this.product) {
+  //     return [];
+  //   }
+
+  //   const images: string[] = [];
+
+  //   const featuredImage =
+  //     this.product.featured_image;
+
+  //   if (featuredImage) {
+  //     images.push(featuredImage);
+  //   }
+
+  //   let gallery: any = this.product.gallery_images || [];
+
+  //   // Handle gallery JSON string
+  //   if (typeof gallery === 'string') {
+  //     try {
+  //       gallery = JSON.parse(gallery);
+  //     } catch {
+  //       gallery = gallery ? [gallery] : [];
+  //     }
+  //   }
+
+  //   if (Array.isArray(gallery)) {
+  //     gallery.forEach((image: any) => {
+  //       let imageUrl = '';
+
+  //       if (typeof image === 'string') {
+  //         imageUrl = image;
+  //       } else if (image && typeof image === 'object') {
+  //         imageUrl =
+  //           image.url ||
+  //           image.file_path ||
+  //           image.path ||
+  //           image.image ||
+  //           '';
+  //       }
+
+  //       if (imageUrl && !images.includes(imageUrl)) {
+  //         images.push(imageUrl);
+  //       }
+  //     });
+  //   }
+
+  //   return images;
+  // }
+
   get productImages(): string[] {
-    if (!this.product) {
-      return [];
-    }
-
-    const images: string[] = [];
-
-    const featuredImage =
-      this.product.featured_image;
-
-    if (featuredImage) {
-      images.push(featuredImage);
-    }
-
-    let gallery: any = this.product.gallery_images || [];
-
-    // Handle gallery JSON string
-    if (typeof gallery === 'string') {
-      try {
-        gallery = JSON.parse(gallery);
-      } catch {
-        gallery = gallery ? [gallery] : [];
-      }
-    }
-
-    if (Array.isArray(gallery)) {
-      gallery.forEach((image: any) => {
-        let imageUrl = '';
-
-        if (typeof image === 'string') {
-          imageUrl = image;
-        } else if (image && typeof image === 'object') {
-          imageUrl =
-            image.url ||
-            image.file_path ||
-            image.path ||
-            image.image ||
-            '';
-        }
-
-        if (imageUrl && !images.includes(imageUrl)) {
-          images.push(imageUrl);
-        }
-      });
-    }
-
-    return images;
+  if (!this.product) {
+    return [];
   }
+
+  const images: string[] = [];
+
+  // Convert image path into Laravel storage URL
+  const getImageUrl = (image: string): string => {
+    if (!image) {
+      return '';
+    }
+
+    // Already a complete URL
+    if (image.startsWith('http://') || image.startsWith('https://')) {
+      return image;
+    }
+
+    // Remove leading slash if present
+    image = image.replace(/^\/+/, '');
+
+    // Avoid adding storage twice
+    if (image.startsWith('storage/')) {
+      return `http://127.0.0.1:8000/${image}`;
+    }
+
+    return `http://127.0.0.1:8000/storage/${image}`;
+  };
+
+  // Featured image
+  const featuredImage = this.product.featured_image;
+
+  if (featuredImage) {
+    images.push(getImageUrl(featuredImage));
+  }
+
+  // Gallery images
+  let gallery: any = this.product.gallery_images || [];
+
+  if (typeof gallery === 'string') {
+    try {
+      gallery = JSON.parse(gallery);
+    } catch {
+      gallery = gallery ? [gallery] : [];
+    }
+  }
+
+  if (Array.isArray(gallery)) {
+    gallery.forEach((image: any) => {
+      let imageUrl = '';
+
+      if (typeof image === 'string') {
+        imageUrl = image;
+      } else if (image && typeof image === 'object') {
+        imageUrl =
+          image.url ||
+          image.file_path ||
+          image.path ||
+          image.image ||
+          '';
+      }
+
+      if (imageUrl) {
+        const finalUrl = getImageUrl(imageUrl);
+
+        if (!images.includes(finalUrl)) {
+          images.push(finalUrl);
+        }
+      }
+    });
+  }
+
+  return images;
+}
 
   // Product price
   get productPrice(): number {

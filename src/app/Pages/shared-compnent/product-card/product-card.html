@@ -3,7 +3,7 @@
   <!-- Image Container (3:4 Portrait Aspect Ratio) -->
   <a [routerLink]="['/product', product.slug]" class="relative block aspect-[3/4] w-full overflow-hidden bg-[#eae8e3]">
     <img 
-      [src]="product.image" 
+      [src]="getProductImage(product.image)" 
       [alt]="product.name"
       class="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
     />
