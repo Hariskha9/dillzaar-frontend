@@ -1,5 +1,5 @@
 
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -13,6 +13,13 @@ import { RouterModule, Router } from '@angular/router';
 
 import { Product } from '../../../../../core/services/product/product';
 import { Media } from '../../../../../core/services/media/media';
+import { CategoryService } from '../../../../../core/services/category/categoryservice';
+import { forkJoin } from 'rxjs';
+
+import { Typeservice, TypeData } from '../../../../../core/services/type/typeservice';
+import { Fabricservice, FabricData } from '../../../../../core/services/fabric/fabricservice';
+import { Collectionservice, CollectionData } from '../../../../../core/services/collection/collectionservice';
+import { Seasonservice, SeasonData } from '../../../../../core/services/season/seasonservice';
 
 interface MediaItem {
   id: number;
@@ -69,11 +76,25 @@ export class ProductCreate implements OnInit {
   // Categories must contain IDs from your categories table.
   categories: { id: number; name: string }[] = [];
 
+
+  types: TypeData[] = [];
+fabrics: FabricData[] = [];
+collections: CollectionData[] = [];
+seasons: SeasonData[] = [];
+
+loadingAttributes = false;
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
     private productService: Product,
-    private mediaService: Media
+    private mediaService: Media,
+    private categoryService: CategoryService,
+     private typeService: Typeservice,
+  private fabricService: Fabricservice,
+  private collectionService: Collectionservice,
+  private seasonService: Seasonservice,
+    private cdr: ChangeDetectorRef
   ) {
 
     this.productForm = this.fb.group({
@@ -101,6 +122,11 @@ export class ProductCreate implements OnInit {
       category_id: [null],
 
       description: [''],
+      type_id: [null],
+fabric_id: [null],
+collection_id: [null],
+season_id: [null],
+short_description: [''],
 
       is_active: [true]
 
@@ -124,7 +150,37 @@ export class ProductCreate implements OnInit {
 
     });
 
+    this.loadCategories();
+this.loadProductAttributes();
   }
+
+
+
+
+
+  loadProductAttributes(): void {
+  this.loadingAttributes = true;
+
+  forkJoin({
+    types: this.typeService.getTypes(),
+    fabrics: this.fabricService.getFabrics(),
+    collections: this.collectionService.getCollections(),
+    seasons: this.seasonService.getSeasons()
+  }).subscribe({
+    next: (response) => {
+      this.types = response.types?.data || [];
+      this.fabrics = response.fabrics?.data || [];
+      this.collections = response.collections?.data || [];
+      this.seasons = response.seasons?.data || [];
+
+      this.loadingAttributes = false;
+    },
+    error: (error) => {
+      console.error('Unable to load product attributes:', error);
+      this.loadingAttributes = false;
+    }
+  });
+}
 
   // ---------------------------------
   // SLUG GENERATOR
@@ -174,6 +230,27 @@ export class ProductCreate implements OnInit {
 
   }
 
+
+ loadCategories(): void {
+    this.categoryService.getCategories(1, 100).subscribe({
+      next: (response: any) => {
+        const result = response?.data;
+
+        this.categories = Array.isArray(result)
+          ? result
+          : Array.isArray(result?.data)
+            ? result.data
+            : [];
+
+            console.log('check 1', this.categories)
+      },
+      error: (error) => {
+        console.error('Categories loading error:', error);
+      }
+    });
+  }
+
+
   // ---------------------------------
   // IMAGE URL
   // ---------------------------------
@@ -186,7 +263,7 @@ export class ProductCreate implements OnInit {
       return path;
     }
 
-    return `http://127.0.0.1:8000/storage/${path}`;
+    return `https://khanibykhanam.pk/api/storage/app/public/${path}`;
 
   }
 
@@ -305,6 +382,7 @@ export class ProductCreate implements OnInit {
     };
 
     reader.readAsDataURL(file);
+            this.cdr.detectChanges();
 
   }
 
@@ -327,6 +405,31 @@ export class ProductCreate implements OnInit {
     );
 
     formData.append('folder', 'products');
+
+    formData.append(
+  'type_id',
+  this.productForm.value.type_id || ''
+);
+
+formData.append(
+  'fabric_id',
+  this.productForm.value.fabric_id || ''
+);
+
+formData.append(
+  'collection_id',
+  this.productForm.value.collection_id || ''
+);
+
+formData.append(
+  'season_id',
+  this.productForm.value.season_id || ''
+);
+
+formData.append(
+  'short_description',
+  this.productForm.value.short_description || ''
+);
 
     this.loading = true;
 
@@ -366,30 +469,76 @@ export class ProductCreate implements OnInit {
   }
 
   // Save image from Create Media drawer
+  // saveNewMedia(): void {
+
+  //   if (!this.newMediaFile) {
+
+  //     this.errorMessage = 'Please select an image first.';
+
+  //     return;
+
+  //   }
+
+  //   if (!this.newMediaAlt.trim()) {
+
+  //     this.errorMessage = 'Please enter image alt text.';
+
+  //     return;
+
+  //   }
+
+  //   this.uploadImageToMedia(
+  //     this.newMediaFile,
+  //     this.targetForMedia
+  //   );
+
+  // }
+
+
   saveNewMedia(): void {
-
-    if (!this.newMediaFile) {
-
-      this.errorMessage = 'Please select an image first.';
-
-      return;
-
-    }
-
-    if (!this.newMediaAlt.trim()) {
-
-      this.errorMessage = 'Please enter image alt text.';
-
-      return;
-
-    }
-
-    this.uploadImageToMedia(
-      this.newMediaFile,
-      this.targetForMedia
-    );
-
+  if (!this.newMediaFile) {
+    this.errorMessage = 'Please select an image.';
+    return;
   }
+
+  const formData = new FormData();
+
+  formData.append('file', this.newMediaFile);
+  formData.append('alt', this.newMediaAlt || '');
+
+  this.mediaLoading = true;
+
+  this.mediaService.uploadMedia(formData).subscribe({
+    next: (response: any) => {
+      this.mediaLoading = false;
+
+      const media = response?.data;
+
+      if (!media?.url) {
+        this.errorMessage = 'Image uploaded, but image URL was not returned.';
+        return;
+      }
+
+      this.assignMedia(media.url);
+
+      this.newMediaFile = null;
+      this.newMediaPreview = null;
+      this.newMediaAlt = '';
+        this.closeDrawer();
+            this.loadMedia();
+        this.cdr.detectChanges();
+
+    },
+    error: (error: any) => {
+      this.mediaLoading = false;
+
+      console.error('Media upload error:', error);
+
+      this.errorMessage =
+        error?.error?.message || 'Unable to upload image.';
+    }
+  });
+}
 
   // ---------------------------------
   // SELECT EXISTING MEDIA
@@ -397,7 +546,7 @@ export class ProductCreate implements OnInit {
 
   selectExistingMedia(media: MediaItem): void {
 
-    this.assignMedia(media);
+    this.assignMedia(media.url);
 
     this.closeDrawer();
 
@@ -407,43 +556,58 @@ export class ProductCreate implements OnInit {
   // ASSIGN MEDIA TO PRODUCT
   // ---------------------------------
 
-  assignMedia(media: MediaItem): void {
+  // assignMedia(media: MediaItem): void {
 
-    const path = media.file_path;
+  //   const path = media.file_path;
 
-    const url = media.url || this.getMediaUrl(path);
+  //   const url = media.url || this.getMediaUrl(path);
 
-    if (!path) {
+  //   if (!path) {
 
-      this.errorMessage = 'Media file path is missing.';
+  //     this.errorMessage = 'Media file path is missing.';
 
-      return;
+  //     return;
 
-    }
+  //   }
 
+  //   if (this.targetForMedia === 'featured') {
+
+  //     this.featuredImagePreview = url;
+
+  //     this.featuredImagePath = path;
+
+  //     this.featuredMediaId = media.id;
+
+  //   } else {
+
+  //     if (!this.galleryPaths.includes(path)) {
+
+  //       this.galleryImages.push(url);
+
+  //       this.galleryPaths.push(path);
+
+  //       this.galleryMediaIds.push(media.id);
+
+  //     }
+
+  //   }
+
+  // }
+
+ assignMedia(url: string): void {
     if (this.targetForMedia === 'featured') {
-
       this.featuredImagePreview = url;
-
-      this.featuredImagePath = path;
-
-      this.featuredMediaId = media.id;
-
+      this.featuredImagePath = url;
     } else {
-
-      if (!this.galleryPaths.includes(path)) {
-
+      if (!this.galleryImages.includes(url)) {
         this.galleryImages.push(url);
-
-        this.galleryPaths.push(path);
-
-        this.galleryMediaIds.push(media.id);
-
       }
-
     }
 
+    this.closeDrawer();
   }
+
+
 
   // ---------------------------------
   // SAVE PRODUCT
@@ -495,6 +659,15 @@ onSave(): void {
     formValue.is_active ? '1' : '0'
   );
 
+      formData.append('type_id', formValue.type_id || '');
+formData.append('fabric_id', formValue.fabric_id || '');
+formData.append('collection_id', formValue.collection_id || '');
+formData.append('season_id', formValue.season_id || '');
+formData.append(
+  'short_description',
+  formValue.short_description || ''
+);
+
   // Send existing media paths, not image files
   if (this.featuredImagePath) {
     formData.append(
@@ -515,7 +688,7 @@ onSave(): void {
 
       this.loading = false;
 
-      this.router.navigate(['/admin/products']);
+      this.router.navigate(['/panel/products']);
 
     },
 

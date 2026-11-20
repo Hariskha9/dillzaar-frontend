@@ -6,6 +6,7 @@ import { RouterModule, ActivatedRoute } from '@angular/router';
 import { ProductCard } from '../shared-compnent/product-card/product-card';
 
 import { Productdata, Product } from '../../core/services/product/product';
+import { CartService } from '../../core/services/cart/cart-service';
 
 @Component({
   selector: 'app-product-detail',
@@ -42,10 +43,13 @@ export class ProductDetail implements OnInit {
   isLightboxOpen = false;
   lightboxImage = '';
 
+  quantity = 1;
+
   constructor(
     private route: ActivatedRoute,
     private productService: Product,
-    private cdr:ChangeDetectorRef
+    private cdr:ChangeDetectorRef,
+    private cartService: CartService
   ) {}
 
   ngOnInit(): void {
@@ -252,6 +256,16 @@ export class ProductDetail implements OnInit {
     });
   }
 
+    getDiscount(regularPrice: number, salePrice: number): number {
+  if (!regularPrice || !salePrice || salePrice >= regularPrice) {
+    return 0;
+  }
+
+  return Math.round(
+    ((regularPrice - salePrice) / regularPrice) * 100
+  );
+}
+
   // Category name
   get categoryName(): string {
     return this.product?.category?.name || 'COLLECTION';
@@ -349,28 +363,50 @@ export class ProductDetail implements OnInit {
   }
 
   // Add product to bag
+  // addToBag(): void {
+  //   if (!this.product) {
+  //     return;
+  //   }
+
+  //   if (!this.isInStock) {
+  //     alert('This product is currently out of stock.');
+  //     return;
+  //   }
+
+  //   // if (!this.selectedSize) {
+  //   //   alert('Please select a size first.');
+  //   //   return;
+  //   // }
+
+  //   // Cart service integration can be added here
+  //   console.log('Product added to bag:', {
+  //     product: this.product,
+  //     size: this.selectedSize,
+  //     quantity: 1
+  //   });
+  // }
+
+
   addToBag(): void {
-    if (!this.product) {
-      return;
-    }
 
-    if (!this.isInStock) {
-      alert('This product is currently out of stock.');
-      return;
-    }
-
-    if (!this.selectedSize) {
-      alert('Please select a size first.');
-      return;
-    }
-
-    // Cart service integration can be added here
-    console.log('Product added to bag:', {
-      product: this.product,
-      size: this.selectedSize,
-      quantity: 1
-    });
+  if (!this.product) {
+    return;
   }
+
+  const quantity = this.quantity || 1;
+  const stock = Number(this.product.stock_quantity || 0);
+
+  if (stock < 1 || quantity > stock) {
+    return;
+  }
+
+  this.cartService.addToCart(
+    this.product,
+    quantity
+  );
+
+  alert('Product added to your bag successfully!');
+}
 
   // Wishlist handler
   handleWishlist(product: any): void {
@@ -381,4 +417,7 @@ export class ProductDetail implements OnInit {
   handleQuickAdd(product: any): void {
     console.log('Quick add product:', product);
   }
+
+
+  
 }

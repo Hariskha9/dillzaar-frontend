@@ -75,7 +75,11 @@
             [alt]="product.name"
             (click)="openLightbox()"
             class="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105">
-
+@if (product.sale_price && product.sale_price < product.regular_price) {
+  <span class="bg-red-500 font-semibold text-[13.9px] absolute top-1 left-1 w-8 h-8 py-1 px-1 rounded-2xl text-white">
+    {{ getDiscount(product.regular_price, product.sale_price) }}% 
+  </span>
+}
           <div class="absolute bottom-3 right-3 bg-black/70 text-white text-[9px] uppercase tracking-widest px-2.5 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
             Click to expand
           </div>
@@ -94,7 +98,7 @@
             {{ categoryName }}
           </p>
 
-          <h1 class="text-4xl font-serif font-normal tracking-tight text-[#111]">
+          <h1 class="text-4xl font-serif font-semibold tracking-tight text-[#111]">
             {{ product.name }}
           </h1>
 
@@ -107,17 +111,20 @@
         </div>
 
         <!-- Price -->
-        <div class="text-lg font-medium tracking-wide text-[#111] pt-2">
-          {{ productPrice }}
-        </div>
+       <div class="flex  items-end">
+      <p class="font-bold text-[18px] pr-1">RS:</p>
+    <p class="text-[19px] font-bold tracking-wider text-gray-900 pr-2 ">
+      {{ product.sale_price | number:'1.0-2'}} 
+    </p>
+    
+    <p class="text-[15px] font-normal tracking-wider text-gray-700 line-through mb-[2px]">
+      {{ product.regular_price | number:'1.0-2'}} 
+    </p>
+    </div>
 
-        <!-- Description -->
-        <p class="text-xs leading-relaxed text-gray-700 max-w-md">
-          {{ product.description || 'Discover this piece from our collection.' }}
-        </p>
 
         <!-- Size Selector -->
-        <div class="pt-4 space-y-3">
+        <!-- <div class="pt-4 space-y-3">
 
           <div class="flex items-center justify-between">
             <span class="text-[10px] font-semibold tracking-[0.2em] uppercase text-gray-900">
@@ -149,39 +156,29 @@
 
           </div>
 
-        </div>
+        </div> -->
 
-        <!-- Add to Bag -->
-        <div class="pt-2">
 
-          <button
-            type="button"
-            (click)="addToBag()"
-            [disabled]="availability === 'OUT OF STOCK'"
-            class="w-full bg-[#111] hover:bg-black text-white py-4 text-[11px] font-semibold tracking-[0.2em] uppercase transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
-
-            {{ availability === 'IN STOCK' ? 'Add to Bag' : 'Out of Stock' }}
-
-          </button>
-
-        </div>
-
-        <!-- Delivery Information -->
-        <div class="text-[10px] tracking-widest text-center text-gray-400 uppercase pt-1">
-          Free Delivery &bull; Easy 14-Day Exchange
-        </div>
-
-        <!-- Specifications -->
+         <!-- Specifications -->
         <div class="border-t border-gray-200 divide-y divide-gray-200 mt-6 text-xs">
+          <div class="py-3 flex justify-between">
+            <span class="text-gray-500 uppercase tracking-wider text-[10px]">
+              Type
+            </span>
+
+            <span class="font-medium uppercase text-[10px]">
+              {{ product.type?.name }}
+            </span>
+          </div>
 
           <div class="py-3 flex justify-between">
             <span class="text-gray-500 uppercase tracking-wider text-[10px]">
               Fabric & Details
             </span>
 
-            <!-- <span class="font-medium uppercase text-[10px]">
-              {{ product.fabric || 'N/A' }}
-            </span> -->
+            <span class="font-medium uppercase text-[10px]">
+              {{ product.fabric?.name }}
+            </span>
           </div>
 
           <div class="py-3 flex justify-between">
@@ -211,10 +208,38 @@
           </div>
 
         </div>
+        <!-- Add to Bag -->
+        <div class="pt-2">
+
+          <button
+            type="button"
+            (click)="addToBag()"
+            [disabled]="availability === 'Out of Stock'"
+            class="w-full bg-[#111] hover:bg-black text-white py-4 text-[11px] font-semibold tracking-[0.2em] uppercase transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+
+            {{ availability === 'In Stock' ? 'Add to Bag' : 'Out of Stock' }}
+
+          </button>
+          
+
+        </div>
+
+        <!-- Delivery Information -->
+        <div class="text-[10px] tracking-widest text-center text-gray-400 uppercase pt-1">
+          Free Delivery &bull; Easy 14-Day Exchange
+        </div>
+
+       
+        <!-- Description -->
+        <p class="text-xs leading-relaxed text-gray-700 max-w-md">
+          {{ product.description || 'Discover this piece from our collection.' }}
+        </p>
 
       </div>
 
     </div>
+
+    
 
     <!-- ================= SECTION 3: RELATED PRODUCTS ================= -->
     <section

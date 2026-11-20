@@ -1,5 +1,5 @@
 
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -12,6 +12,14 @@ import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 
 import { Product } from '../../../../../core/services/product/product';
 import { CategoryService, Category } from '../../../../../core/services/category/categoryservice';
+import { Media } from '../../../../../core/services/media/media';
+import { forkJoin } from 'rxjs';
+
+import { Typeservice, TypeData } from '../../../../../core/services/type/typeservice';
+import { Fabricservice, FabricData } from '../../../../../core/services/fabric/fabricservice';
+import { Collectionservice, CollectionData } from '../../../../../core/services/collection/collectionservice';
+import { Seasonservice, SeasonData } from '../../../../../core/services/season/seasonservice';
+
 
 interface MediaItem {
   id: number;
@@ -46,6 +54,9 @@ export class ProductEdit implements OnInit {
   activeDrawer: 'none' | 'create-media' | 'select-media' = 'none';
   targetForMedia: 'featured' | 'gallery' = 'gallery';
 
+    mediaLoading = false;
+
+  newMediaFile: File | null = null;
   newMediaPreview: string | null = null;
   newMediaAlt = '';
 
@@ -54,12 +65,23 @@ export class ProductEdit implements OnInit {
   // Keep your existing media drawer data for now
   existingMediaItems: MediaItem[] = [];
 
+  types: TypeData[] = [];
+fabrics: FabricData[] = [];
+collections: CollectionData[] = [];
+seasons: SeasonData[] = [];
+
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
     private productService: Product,
-    private categoryService: CategoryService
+    private categoryService: CategoryService,
+     private mediaService: Media,
+      private typeService: Typeservice,
+  private fabricService: Fabricservice,
+  private collectionService: Collectionservice,
+  private seasonService: Seasonservice,
+  private cdr: ChangeDetectorRef
   ) {
     this.productForm = this.fb.group({
       name: ['', Validators.required],
@@ -70,7 +92,12 @@ export class ProductEdit implements OnInit {
       stock: [1, [Validators.required, Validators.min(0)]],
       category: ['', Validators.required],
       description: [''],
-      active: [true]
+      active: [true],
+      type_id: [null],
+fabric_id: [null],
+collection_id: [null],
+season_id: [null],
+short_description: ['']
     });
   }
 
@@ -86,7 +113,58 @@ export class ProductEdit implements OnInit {
 
     this.loadCategories();
     this.loadProduct();
+    this.loadMedia();
+    this.loadProductAttributes();
   }
+
+
+
+  loadProductAttributes(): void {
+  forkJoin({
+    types: this.typeService.getTypes(),
+    fabrics: this.fabricService.getFabrics(),
+    collections: this.collectionService.getCollections(),
+    seasons: this.seasonService.getSeasons()
+  }).subscribe({
+    next: (response) => {
+      this.types = response.types?.data || [];
+      this.fabrics = response.fabrics?.data || [];
+      this.collections = response.collections?.data || [];
+      this.seasons = response.seasons?.data || [];
+     this.setProductAttributes();
+      
+    },
+    error: (error) => {
+      console.error('Unable to load product attributes:', error);
+    }
+  });
+}
+
+productData: any = null;
+
+setProductAttributes(): void {
+  if (!this.productData) return;
+
+  this.productForm.patchValue({
+    type_id: this.productData.type_id
+      ? Number(this.productData.type_id)
+      : null,
+
+    fabric_id: this.productData.fabric_id
+      ? Number(this.productData.fabric_id)
+      : null,
+
+    collection_id: this.productData.collection_id
+      ? Number(this.productData.collection_id)
+      : null,
+
+    season_id: this.productData.season_id
+      ? Number(this.productData.season_id)
+      : null
+  });
+}
+
+
 
   // -----------------------------
   // Load Categories
@@ -110,6 +188,36 @@ export class ProductEdit implements OnInit {
     });
   }
 
+ loadMedia(): void {
+
+    this.mediaLoading = true;
+
+    this.mediaService.getMedia().subscribe({
+
+      next: (response: any) => {
+
+        const result = response.data;
+
+        this.existingMediaItems = Array.isArray(result)
+          ? result
+          : result?.data || [];
+
+        this.mediaLoading = false;
+
+      },
+
+      error: (error: any) => {
+
+        console.error('Media loading error:', error);
+
+        this.mediaLoading = false;
+
+      }
+
+    });
+
+  }
+
   // -----------------------------
   // Get Product By ID
   // -----------------------------
@@ -122,7 +230,7 @@ export class ProductEdit implements OnInit {
     this.productService.getProduct(this.productId).subscribe({
       next: (response: any) => {
         const product = response?.data ?? response;
-
+this.productData = product;
         if (!product) {
           this.errorMessage = 'Product not found.';
           this.loading = false;
@@ -139,7 +247,12 @@ export class ProductEdit implements OnInit {
           stock: product.stock_quantity ?? 0,
           category: product.category_id ?? '',
           description: product.description ?? '',
-          active: Boolean(product.is_active)
+          active: Boolean(product.is_active),
+           type_id: product.type_id ?? null,
+  fabric_id: product.fabric_id ?? null,
+  collection_id: product.collection_id ?? null,
+  season_id: product.season_id ?? null,
+  short_description: product.short_description ?? ''
         });
 
         // Load featured image
@@ -234,6 +347,8 @@ export class ProductEdit implements OnInit {
 
     if (!file) return;
 
+      this.newMediaFile = file;
+
     const reader = new FileReader();
 
     reader.onload = () => {
@@ -241,15 +356,64 @@ export class ProductEdit implements OnInit {
     };
 
     reader.readAsDataURL(file);
+            this.cdr.detectChanges();
+
   }
+
+  // saveNewMedia(): void {
+  //   if (!this.newMediaPreview) return;
+
+  //   // This is a local preview only.
+  //   // Upload the file through your Media API to get a permanent path.
+  //   this.assignMedia(this.newMediaPreview);
+  // }
+
 
   saveNewMedia(): void {
-    if (!this.newMediaPreview) return;
-
-    // This is a local preview only.
-    // Upload the file through your Media API to get a permanent path.
-    this.assignMedia(this.newMediaPreview);
+  if (!this.newMediaFile) {
+    this.errorMessage = 'Please select an image.';
+    return;
   }
+
+  const formData = new FormData();
+
+  formData.append('file', this.newMediaFile);
+  formData.append('alt', this.newMediaAlt || '');
+
+  this.mediaLoading = true;
+
+  this.mediaService.uploadMedia(formData).subscribe({
+    next: (response: any) => {
+      this.mediaLoading = false;
+
+      const media = response?.data;
+
+      if (!media?.url) {
+        this.errorMessage = 'Image uploaded, but image URL was not returned.';
+        return;
+      }
+
+      this.assignMedia(media.url);
+
+      this.newMediaFile = null;
+      this.newMediaPreview = null;
+      this.newMediaAlt = '';
+        this.closeDrawer();
+            this.loadMedia();
+
+        this.cdr.detectChanges();
+
+    },
+    error: (error: any) => {
+      this.mediaLoading = false;
+
+      console.error('Media upload error:', error);
+
+      this.errorMessage =
+        error?.error?.message || 'Unable to upload image.';
+    }
+  });
+}
 
   selectExistingMedia(media: MediaItem): void {
     this.assignMedia(media.url);
@@ -296,10 +460,21 @@ export class ProductEdit implements OnInit {
     formData.append('sale_price', String(formValue.salePrice ?? 0));
     formData.append('stock_quantity', String(formValue.stock ?? 0));
     formData.append('is_active', formValue.active ? '1' : '0');
+    formData.append('type_id', formValue.type_id || '');
+formData.append('fabric_id', formValue.fabric_id || '');
+formData.append('collection_id', formValue.collection_id || '');
+formData.append('season_id', formValue.season_id || '');
+formData.append(
+  'short_description',
+  formValue.short_description || ''
+);
 
     // Featured image path
     if (this.featuredImagePreview) {
-      formData.append('featured_image', this.featuredImagePath || this.featuredImagePreview);
+      formData.append(
+  'featured_image',
+  this.featuredImagePath || ''
+);
     } else {
       formData.append('featured_image', '');
     }
@@ -316,8 +491,10 @@ export class ProductEdit implements OnInit {
           response?.message || 'Product updated successfully.';
 
         setTimeout(() => {
-          this.router.navigate(['/admin/products']);
+          this.router.navigate(['/panel/products']);
         }, 1000);
+                this.cdr.detectChanges();
+
       },
       error: (error) => {
         console.error('Product update error:', error);
@@ -329,6 +506,6 @@ export class ProductEdit implements OnInit {
   }
 
   cancel(): void {
-    this.router.navigate(['/admin/products']);
+    this.router.navigate(['/panel/products']);
   }
 }

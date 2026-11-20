@@ -105,7 +105,7 @@ export class Products implements OnInit {
 
     const baseUrl = environment.apiUrl.replace(/\/api\/?$/, '');
 
-    return `${baseUrl}/storage/${path}`;
+    return `${baseUrl}/storage/app/public/${path}`;
   }
 
   // View product

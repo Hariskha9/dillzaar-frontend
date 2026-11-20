@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { Sidenav } from '../sidenav/sidenav';
 import { Observable } from 'rxjs';
 import { Auth } from '../../../core/services/auth/auth';
@@ -16,7 +16,7 @@ export class PanelBody {
 
   user$: Observable<any>;
 
-  constructor(private auth: Auth) {
+  constructor(private auth: Auth,   private router: Router) {
       this.user$ = this.auth.user$;
 
   }
@@ -28,4 +28,19 @@ export class PanelBody {
   closeSidebar() {
     this.isSidebarOpen = false;
   }
+
+  logout(): void {
+  this.auth.logout().subscribe({
+    next: () => {
+      this.router.navigate(['/login']);
+    },
+    error: () => {
+      // Clear local session even if API fails
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+
+      this.router.navigate(['/login']);
+    }
+  });
+}
 }

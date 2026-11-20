@@ -49,6 +49,17 @@
             </div>
           </div>
 
+                  <!-- Short Description -->
+<div class="md:col-span-2">
+  <label class="block text-sm font-medium mb-2">Short Description</label>
+  <textarea
+    formControlName="short_description"
+    rows="3"
+    placeholder="Enter short product description"
+    class="w-full bg-[#1c1c1c] border border-gray-700 rounded-lg px-4 py-3 text-white"
+  ></textarea>
+</div>
+
           <div>
             <label class="block text-xs font-semibold tracking-wider text-gray-300 uppercase mb-2">Description</label>
             <textarea rows="5" formControlName="description" class="w-full bg-[#161616] border border-[#2d2d2d] rounded p-4 text-xs text-white focus:outline-none"></textarea>
@@ -105,11 +116,71 @@
           </div>
         </div>
 
+              <!-- Type  Box -->
+        <div class="bg-[#1e1e1e] border border-[#2d2d2d] p-6 rounded shadow-sm space-y-4">
+          <h3 class="text-sm font-semibold text-white uppercase tracking-wider border-b border-[#2d2d2d] pb-3">Product Type</h3>
+          <select formControlName="type_id"
+  class="w-full bg-[#161616] border border-[#2d2d2d] rounded px-4 py-2.5 text-xs text-white">
+
+  <option [ngValue]="null">Select Type</option>
+
+  <option *ngFor="let item  of types" [ngValue]="item.id">
+    {{ item.name }}
+  </option>
+
+</select>
+        </div>
+
+          <!-- Fabric  Box -->
+        <div class="bg-[#1e1e1e] border border-[#2d2d2d] p-6 rounded shadow-sm space-y-4">
+          <h3 class="text-sm font-semibold text-white uppercase tracking-wider border-b border-[#2d2d2d] pb-3">Fabric</h3>
+          <select formControlName="fabric_id"
+  class="w-full bg-[#161616] border border-[#2d2d2d] rounded px-4 py-2.5 text-xs text-white">
+
+  <option [ngValue]="null">Select Fabric</option>
+
+  <option *ngFor="let item  of fabrics" [ngValue]="item.id">
+    {{ item.name }}
+  </option>
+
+</select>
+        </div>
+
+            <!-- Collection  Box -->
+        <div class="bg-[#1e1e1e] border border-[#2d2d2d] p-6 rounded shadow-sm space-y-4">
+          <h3 class="text-sm font-semibold text-white uppercase tracking-wider border-b border-[#2d2d2d] pb-3">Collection</h3>
+          <select formControlName="collection_id"
+  class="w-full bg-[#161616] border border-[#2d2d2d] rounded px-4 py-2.5 text-xs text-white">
+
+  <option [ngValue]="null">Select Collection</option>
+
+  <option *ngFor="let item  of collections" [ngValue]="item.id">
+    {{ item.name }}
+  </option>
+
+</select>
+        </div>
+
+         <!-- Season Box -->
+        <div class="bg-[#1e1e1e] border border-[#2d2d2d] p-6 rounded shadow-sm space-y-4">
+          <h3 class="text-sm font-semibold text-white uppercase tracking-wider border-b border-[#2d2d2d] pb-3">Season</h3>
+          <select formControlName="season_id"
+  class="w-full bg-[#161616] border border-[#2d2d2d] rounded px-4 py-2.5 text-xs text-white">
+
+  <option [ngValue]="null">Select Season</option>
+
+  <option *ngFor="let item  of seasons" [ngValue]="item.id">
+    {{ item.name }}
+  </option>
+
+</select>
+        </div>
+
         <!-- Category Box -->
         <div class="bg-[#1e1e1e] border border-[#2d2d2d] p-6 rounded shadow-sm space-y-4">
           <h3 class="text-sm font-semibold text-white uppercase tracking-wider border-b border-[#2d2d2d] pb-3">Category</h3>
           <select formControlName="category" class="w-full bg-[#161616] border border-[#2d2d2d] rounded px-4 py-2.5 text-xs text-white focus:outline-none">
-            <option *ngFor="let cat of categories" [value]="cat">{{ cat.name }}</option>
+            <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</option>
           </select>
         </div>
 
@@ -128,8 +199,8 @@
           
           <input type="file" #featuredDesktopInput (change)="onFeaturedDesktopFileSelected($event)" accept="image/*" class="hidden" />
 
-          <div *ngIf="featuredImagePreview; else featuredPrompt" class="relative w-full h-44 bg-black rounded border border-[#3d3d3d] overflow-hidden group">
-            <img [src]="featuredImagePreview" class="w-full h-full object-cover" />
+          <div *ngIf="featuredImagePreview; else featuredPrompt" class="relative w-full h-89 bg-black rounded border border-[#3d3d3d] overflow-hidden group">
+            <img [src]="featuredImagePreview" class="w-full h-full object-contain" />
             <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
               <button type="button" (click)="removeFeaturedImage()" class="bg-rose-600 text-white px-3 py-1.5 rounded text-xs">Remove</button>
             </div>
@@ -153,7 +224,7 @@
 
 
   <!-- ================= SIDE DRAWER: CREATE NEW MEDIA ================= -->
-  <div *ngIf="activeDrawer === 'create-media'" class="w-full lg:w-[500px] bg-[#181818] border-l border-[#2d2d2d] flex flex-col h-screen sticky top-0 shadow-2xl z-50">
+  <div *ngIf="activeDrawer === 'create-media'" class="w-full lg:w-[500px] bg-[#181818] border-l border-[#2d2d2d] flex flex-col h-screen fixed top-0 right-0  shadow-2xl z-50 animate-slide-in">
     <div class="h-16 flex items-center justify-between px-6 border-b border-[#2d2d2d]">
       <div class="flex items-center space-x-2 text-xs text-gray-400">
         <button (click)="activeDrawer = 'select-media'" class="hover:text-white">&lsaquo;</button>
@@ -186,7 +257,7 @@
 
 
   <!-- ================= SIDE DRAWER: SELECT EXISTING MEDIA ================= -->
-  <div *ngIf="activeDrawer === 'select-media'" class="w-full lg:w-[700px] bg-[#181818] border-l border-[#2d2d2d] flex flex-col h-screen sticky top-0 shadow-2xl z-50">
+  <div *ngIf="activeDrawer === 'select-media'" class="w-full lg:w-[500px] bg-[#181818] border-l border-[#2d2d2d] flex flex-col h-screen fixed top-0 right-0  shadow-2xl z-50 animate-slide-in">
     <div class="h-16 flex items-center justify-between px-6 border-b border-[#2d2d2d]">
       <div class="flex items-center space-x-2 text-xs text-gray-400">
         <button (click)="closeDrawer()" class="hover:text-white">&lsaquo;</button>

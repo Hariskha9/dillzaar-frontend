@@ -16,6 +16,7 @@ import { roleGuard } from './core/guards/role/role-guard';
 import { guestGuard } from './core/guards/guest/guest-guard';
 import { CategoryEdit } from './Panel/pages/categories/components/category-edit/category-edit';
 import { ProductDetail } from './Pages/product-detail/product-detail';
+import { Cart } from './Pages/cart/cart';
 
 export const routes: Routes = [
      {
@@ -24,6 +25,10 @@ export const routes: Routes = [
     children: [
       { path: '', component: Home },
        { path: 'product/:slug', component: ProductDetail },
+       {
+  path: 'cart',
+  component: Cart
+},
       {path:'login', component: Login,  canActivate: [guestGuard],}
     ]
   },

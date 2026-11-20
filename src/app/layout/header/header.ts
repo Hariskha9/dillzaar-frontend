@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { CartService } from '../../core/services/cart/cart-service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-header',
@@ -8,9 +10,11 @@ import { RouterModule } from '@angular/router';
   templateUrl: './header.html',
   styleUrl: './header.css',
 })
-export class Header {
+export class Header implements OnInit , OnDestroy {
   isMobileMenuOpen = false;
   cartItemCount = 0; // Update dynamically based on your cart service
+  private cartService = inject(CartService);
+
 
   navItems = [
     { label: 'NEW IN', route: '/new-in' },
@@ -27,4 +31,23 @@ export class Header {
   toggleMobileMenu() {
     this.isMobileMenuOpen = !this.isMobileMenuOpen;
   }
+
+  ngOnInit(): void {
+  this.updateCartCount();
+  window.addEventListener('storage', this.handleStorageChange);
+}
+
+ngOnDestroy(): void {
+  window.removeEventListener('storage', this.handleStorageChange);
+}
+
+updateCartCount(): void {
+  this.cartItemCount = this.cartService.getTotalItems();
+}
+
+private handleStorageChange = (event: StorageEvent): void => {
+  if (event.key === 'dillzaar_cart') {
+    this.updateCartCount();
+  }
+};
 }

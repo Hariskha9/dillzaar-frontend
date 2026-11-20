@@ -1,13 +1,18 @@
 <div class="group flex flex-col font-sans text-[#1a1a1a]">
   
   <!-- Image Container (3:4 Portrait Aspect Ratio) -->
-  <a [routerLink]="['/product', product.slug]" class="relative block aspect-[3/4] w-full overflow-hidden bg-[#eae8e3]">
+  <a [routerLink]="['/product', product.slug]" class="relative block  w-full overflow-hidden bg-[#eae8e3]">
     <img 
-      [src]="getProductImage(product.image)" 
+      [src]="product.image" 
       [alt]="product.name"
-      class="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
+      class="w-full h-auto object-contain object-center transition-transform duration-700 ease-out group-hover:scale-105"
     />
 
+@if (product.salePrice && product.salePrice < product.regularPrice) {
+  <span class="bg-red-500 font-semibold text-[13.9px] absolute top-1 left-1 w-8 h-8 py-1 px-1 rounded-2xl text-white">
+    {{ getDiscount(product.regularPrice, product.salePrice) }}% 
+  </span>
+}
     <!-- Top-Right Circular Wishlist Button -->
     <button 
       type="button"
@@ -37,18 +42,25 @@
   </a>
 
   <!-- Centered Product Meta Below Image -->
-  <div class="text-center pt-4 space-y-1">
+  <div class="text-start pt-4 space-y-1">
     <p class="text-[9px] tracking-[0.2em] uppercase text-gray-400">
       {{ product.category }}
     </p>
-    <h3 class="text-sm font-serif text-[#111]">
+    <h3 class="text-md font-semibold font-serif text-[#111]">
       <a [routerLink]="['/product', product.slug]" class="hover:underline">
         {{ product.name }} 
       </a>
     </h3>
-    <p class="text-[11px] font-medium tracking-wider text-gray-700">
-      {{ product.price }} 
+    <div class="flex  items-end">
+      <p class="font-bold text-[15px] pr-1">RS:</p>
+    <p class="text-[16px] font-bold tracking-wider text-gray-900 pr-2 ">
+      {{ product.salePrice | number:'1.0-2'}} 
     </p>
+    
+    <p class="text-[12px] font-normal tracking-wider text-gray-700 line-through mb-[2px]">
+      {{ product.regularPrice | number:'1.0-2'}} 
+    </p>
+    </div>
   </div>
 
 </div>

@@ -1,0 +1,181 @@
+
+<div class="min-h-screen bg-white px-4 py-12 md:px-8">
+  <div class="mx-auto max-w-7xl">
+
+    <!-- Header -->
+    <div class="mb-10">
+      <p class="mb-2 text-xs font-semibold uppercase tracking-[3px] text-gray-500">
+        Your Shopping Bag
+      </p>
+
+      <h1 class="text-3xl font-semibold text-gray-900 md:text-4xl">
+        Shopping Cart
+      </h1>
+
+      <p class="mt-2 text-sm text-gray-500">
+        {{ totalItems }} items in your cart
+      </p>
+    </div>
+
+    <!-- Empty Cart -->
+    <div *ngIf="cartItems.length === 0"
+         class="py-24 text-center">
+
+      <div class="mb-6 text-6xl">🛍️</div>
+
+      <h2 class="text-2xl font-semibold text-gray-900">
+        Your cart is empty
+      </h2>
+
+      <p class="mt-3 text-sm text-gray-500">
+        You haven't added any products to your bag yet.
+      </p>
+
+      <a routerLink="/shop"
+         class="mt-8 inline-block bg-black px-8 py-3 text-sm font-semibold text-white hover:bg-gray-800">
+        Continue Shopping
+      </a>
+    </div>
+
+    <!-- Cart Items -->
+    <div *ngIf="cartItems.length > 0"
+         class="grid grid-cols-1 gap-10 lg:grid-cols-3">
+
+      <div class="lg:col-span-2">
+
+        <div class="hidden grid-cols-12 gap-4 border-b border-gray-200 pb-4 text-xs font-semibold uppercase tracking-wider text-gray-500 md:grid">
+          <div class="col-span-6">Product</div>
+          <div class="col-span-2">Price</div>
+          <div class="col-span-2">Quantity</div>
+          <div class="col-span-2 text-right">Total</div>
+        </div>
+
+        <div *ngFor="let item of cartItems"
+             class="grid grid-cols-1 gap-4 border-b border-gray-200 py-6 md:grid-cols-12 md:items-center">
+
+          <!-- Product -->
+          <div class="flex gap-4 md:col-span-6">
+            <img
+              [src]="item.featured_image || 'assets/images/placeholder.png'"
+              [alt]="item.name"
+              class="h-28 w-24 bg-gray-100 object-cover"
+            />
+
+            <div class="flex flex-col justify-center">
+              <h3 class="font-semibold text-gray-900">
+                {{ item.name }}
+              </h3>
+
+              <p class="mt-1 text-xs text-gray-500">
+                SKU: {{ item.sku || 'N/A' }}
+              </p>
+
+              <button
+                type="button"
+                (click)="removeItem(item.id)"
+                class="mt-3 w-fit text-xs text-red-600 underline underline-offset-4">
+                Remove
+              </button>
+            </div>
+          </div>
+
+          <!-- Price -->
+          <div class="flex items-center justify-between md:col-span-2">
+            <span class="text-xs text-gray-500 md:hidden">Price</span>
+            <span class="text-sm font-medium">
+              Rs. {{ getItemPrice(item) | number:'1.0-2' }}
+            </span>
+          </div>
+
+          <!-- Quantity -->
+          <div class="flex items-center justify-between md:col-span-2">
+            <span class="text-xs text-gray-500 md:hidden">Quantity</span>
+
+            <div class="flex items-center border border-gray-300">
+              <button
+                type="button"
+                (click)="decreaseQuantity(item)"
+                [disabled]="item.quantity <= 1"
+                class="px-3 py-2 hover:bg-gray-100 disabled:opacity-40">
+                −
+              </button>
+
+              <span class="min-w-10 text-center text-sm">
+                {{ item.quantity }}
+              </span>
+
+              <button
+                type="button"
+                (click)="increaseQuantity(item)"
+                [disabled]="item.quantity >= item.stock_quantity"
+                class="px-3 py-2 hover:bg-gray-100 disabled:opacity-40">
+                +
+              </button>
+            </div>
+          </div>
+
+          <!-- Item Total -->
+          <div class="flex items-center justify-between md:col-span-2 md:justify-end">
+            <span class="text-xs text-gray-500 md:hidden">Total</span>
+
+            <span class="text-sm font-semibold">
+              Rs. {{ getItemTotal(item) | number:'1.0-2' }}
+            </span>
+          </div>
+
+        </div>
+
+        <!-- Cart Actions -->
+        <div class="flex justify-between pt-6">
+          <a routerLink="/shop"
+             class="text-sm font-medium underline underline-offset-4">
+            Continue Shopping
+          </a>
+
+          <button
+            type="button"
+            (click)="clearCart()"
+            class="text-sm text-red-600">
+            Clear Cart
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Order Summary -->
+      <div class="h-fit border border-gray-200 p-6">
+
+        <h2 class="text-xl font-semibold">
+          Order Summary
+        </h2>
+
+        <div class="mt-6 flex justify-between border-b border-gray-200 pb-5 text-sm">
+          <span class="text-gray-500">Subtotal</span>
+          <span class="font-medium">
+            Rs. {{ subtotal | number:'1.0-2' }}
+          </span>
+        </div>
+
+        <div class="flex justify-between py-6">
+          <span class="font-semibold">Total</span>
+          <span class="text-lg font-bold">
+            Rs. {{ subtotal | number:'1.0-2' }}
+          </span>
+        </div>
+
+        <button
+          type="button"
+          [disabled]="cartItems.length === 0"
+          class="w-full bg-black py-4 text-sm font-semibold uppercase tracking-wider text-white hover:bg-gray-800 disabled:opacity-50">
+          Proceed to Checkout
+        </button>
+
+        <p class="mt-4 text-center text-xs text-gray-500">
+          Secure checkout
+        </p>
+
+      </div>
+    </div>
+
+  </div>
+</div>

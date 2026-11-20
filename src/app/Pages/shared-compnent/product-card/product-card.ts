@@ -33,4 +33,14 @@ export class ProductCard {
     event.preventDefault();
     this.quickAddClick.emit(this.product);
   }
+
+  getDiscount(regularPrice: number, salePrice: number): number {
+  if (!regularPrice || !salePrice || salePrice >= regularPrice) {
+    return 0;
+  }
+
+  return Math.round(
+    ((regularPrice - salePrice) / regularPrice) * 100
+  );
+}
 }

@@ -2,6 +2,10 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
+import { TypeData } from '../type/typeservice';
+import { FabricData } from '../fabric/fabricservice';
+import { CollectionData } from '../collection/collectionservice';
+import { SeasonData } from '../season/seasonservice';
 
 export interface Productdata {
   id?: number;
@@ -17,6 +21,16 @@ export interface Productdata {
   gallery_images?: string[];
   is_active: boolean;
   category?: any;
+  type_id?: number | null;
+fabric_id?: number | null;
+collection_id?: number | null;
+season_id?: number | null;
+short_description?: string | null;
+
+type?: TypeData | null;
+fabric?: FabricData | null;
+collection?: CollectionData | null;
+season?: SeasonData | null;
 }
 
 export interface ApiResponse<T> {
