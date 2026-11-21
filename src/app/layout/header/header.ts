@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { CartService } from '../../core/services/cart/cart-service';
@@ -14,40 +14,55 @@ export class Header implements OnInit , OnDestroy {
   isMobileMenuOpen = false;
   cartItemCount = 0; // Update dynamically based on your cart service
   private cartService = inject(CartService);
+  private cartSubscription?: Subscription;
 
 
   navItems = [
-    { label: 'NEW IN', route: '/new-in' },
-    { label: 'LUXURY LAWN', route: '/luxury-lawn' },
-    { label: 'READY TO WEAR', route: '/ready-to-wear' },
-    { label: 'FESTIVE', route: '/festive' },
-    { label: 'SHOP ALL', route: '/shop-all' },
+    { label: 'Home', route: '/' },
+    { label: 'All Products', route: '/products' },
+    { label: 'Three Piece', route: '/ready-to-wear' },
+    { label: 'Two  Piece', route: '/festive' },
+    { label: 'Embroidery', route: '/shop-all' },
     { label: 'JOURNAL', route: '/journal' },
     { label: 'OUR STORY', route: '/our-story' },
     { label: 'CONTACT', route: '/contact' },
-    { label: 'MY ACCOUNT', route: '/account' }
+    { label: 'MY ACCOUNT', route: '/panel' }
   ];
+
+  constructor(private cdr:ChangeDetectorRef){}
 
   toggleMobileMenu() {
     this.isMobileMenuOpen = !this.isMobileMenuOpen;
   }
 
   ngOnInit(): void {
-  this.updateCartCount();
-  window.addEventListener('storage', this.handleStorageChange);
+     this.cartSubscription = this.cartService.cartCount$.subscribe(count => {
+      this.cartItemCount = count;
+      this.cdr.detectChanges();
+    });
+
+        this.cartService.refreshCartCount();
+
+  // this.updateCartCount();
+  // window.addEventListener('storage', this.handleStorageChange);
 }
 
 ngOnDestroy(): void {
-  window.removeEventListener('storage', this.handleStorageChange);
+      this.cartSubscription?.unsubscribe();
+
+  // window.removeEventListener('storage', this.handleStorageChange);
 }
 
 updateCartCount(): void {
   this.cartItemCount = this.cartService.getTotalItems();
+      this.cdr.detectChanges();
+
 }
 
 private handleStorageChange = (event: StorageEvent): void => {
-  if (event.key === 'dillzaar_cart') {
+  if (event.key === 'khanibykhanam_cart') {
     this.updateCartCount();
+    this.cdr.detectChanges();
   }
 };
 }

@@ -1,147 +1,260 @@
+
 <div class="space-y-6 font-sans text-gray-200">
-  
+
   <!-- Breadcrumb & Top Bar -->
   <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
     <div>
       <div class="text-xs text-gray-400 mb-1">
-        <span>Dashboard</span> <span class="mx-1">/</span> <span class="text-white">Orders</span> 
+        <span>Dashboard</span>
+        <span class="mx-1">/</span>
+        <span class="text-white">Orders</span>
       </div>
-      <h1 class="text-3xl font-serif font-bold text-white tracking-wide">Orders</h1> 
+
+      <h1 class="text-3xl font-serif font-bold text-white tracking-wide">
+        Orders
+      </h1>
     </div>
 
-    <!-- Actions / Controls & Create Button -->
-    <div class="flex items-center space-x-3">
-      <button class="bg-[#1e1e1e] hover:bg-[#2a2a2a] text-gray-300 px-3 py-2 text-xs font-semibold tracking-wider uppercase border border-[#2d2d2d] transition-colors">
-        Filters 
+    <div class="flex flex-wrap items-center gap-3">
+      <button
+        (click)="loadOrders()"
+        [disabled]="loading"
+        class="bg-[#1e1e1e] hover:bg-[#2a2a2a] text-gray-300 px-3 py-2 text-xs font-semibold tracking-wider uppercase border border-[#2d2d2d] transition-colors disabled:opacity-50">
+        Refresh
       </button>
-      <button class="bg-[#1e1e1e] hover:bg-[#2a2a2a] text-gray-300 px-3 py-2 text-xs font-semibold tracking-wider uppercase border border-[#2d2d2d] transition-colors">
-        Group by 
-      </button>
-      <button class="bg-[#1e1e1e] hover:bg-[#2a2a2a] text-gray-300 px-3 py-2 text-xs font-semibold tracking-wider uppercase border border-[#2d2d2d] transition-colors">
-        Columns 
-      </button>
-      <!-- Create New Order Button -->
-      <button (click)="onCreateOrder()" routerLink="/admin/orders/create" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 text-xs font-semibold tracking-wider uppercase transition-colors">
-        Create New 
-      </button>
-    </div>
-  </div>
 
-  <!-- Search Input Bar -->
-  <div class="bg-[#1e1e1e] border border-[#2d2d2d] p-4 flex items-center justify-between">
-    <div class="relative w-full max-w-sm">
-      <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-          <circle cx="11" cy="11" r="8"></circle>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-        </svg>
-      </span>
-      <input 
-        type="text" 
-        placeholder="Search..."
-        class="w-full bg-[#161616] border border-[#2d2d2d] rounded-none pl-10 pr-4 py-2 text-xs text-white focus:outline-none focus:border-gray-500 transition-colors"
-      />
+      <button
+        routerLink="/admin/orders/create"
+        class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 text-xs font-semibold tracking-wider uppercase transition-colors">
+        Create New
+      </button>
     </div>
   </div>
 
-  <!-- Conditional View: When Orders Exist -->
-  <div *ngIf="orders.length > 0; else emptyState" class="bg-[#1e1e1e] border border-[#2d2d2d] overflow-hidden shadow-sm">
+  <!-- Search & Filters -->
+  <div class="bg-[#1e1e1e] border border-[#2d2d2d] p-4">
+    <div class="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+
+      <div class="relative w-full max-w-md">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor"
+            viewBox="0 0 24 24" stroke-width="1.5">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </span>
+
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          placeholder="Search order, customer, email, phone..."
+          class="w-full bg-[#161616] border border-[#2d2d2d] rounded-none pl-10 pr-4 py-2.5 text-xs text-white focus:outline-none focus:border-gray-500 transition-colors"
+        />
+      </div>
+
+      <div class="text-xs text-gray-400">
+        Total Orders:
+        <span class="text-white font-semibold">
+          {{ filteredOrders.length }}
+        </span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div
+    *ngIf="loading"
+    class="bg-[#1e1e1e] border border-[#2d2d2d] py-16 text-center">
+
+    <div class="inline-block w-7 h-7 border-2 border-gray-600 border-t-blue-500 rounded-full animate-spin mb-3"></div>
+
+    <p class="text-xs text-gray-400">
+      Loading orders...
+    </p>
+  </div>
+
+  <!-- Error -->
+  <div
+    *ngIf="!loading && errorMessage"
+    class="bg-red-950/30 border border-red-900/50 p-5 text-center">
+
+    <p class="text-sm text-red-400 mb-3">
+      {{ errorMessage }}
+    </p>
+
+    <button
+      (click)="loadOrders()"
+      class="bg-red-900/50 hover:bg-red-900 text-white px-4 py-2 text-xs">
+      Try Again
+    </button>
+  </div>
+
+  <!-- Orders Table -->
+  <div
+    *ngIf="!loading && !errorMessage && filteredOrders.length > 0"
+    class="bg-[#1e1e1e] border border-[#2d2d2d] overflow-hidden shadow-sm">
+
     <div class="overflow-x-auto">
+
       <table class="w-full text-left text-xs">
+
+        <!-- Table Header -->
         <thead class="bg-[#161616] text-gray-400 uppercase tracking-wider border-b border-[#2d2d2d]">
           <tr>
-            <th class="py-3 px-4 w-10">
-              <input type="checkbox" class="rounded bg-[#2a2a2a] border-[#3d3d3d] text-blue-600 focus:ring-0 cursor-pointer">
+            <th class="py-4 px-4 w-10">
+              <input
+                type="checkbox"
+                class="rounded bg-[#2a2a2a] border-[#3d3d3d] text-blue-600 focus:ring-0 cursor-pointer">
             </th>
-            <th class="py-3 px-4">Order ID</th>
-            <th class="py-3 px-4">Customer</th>
-            <th class="py-3 px-4">Total Amount</th>
-            <th class="py-3 px-4">Status</th>
-            <th class="py-3 px-4">Date</th>
-            <th class="py-3 px-4 text-center">Action</th>
+
+            <th class="py-4 px-4 whitespace-nowrap">Order ID</th>
+            <th class="py-4 px-4 whitespace-nowrap">Customer</th>
+            <th class="py-4 px-4 whitespace-nowrap">Total Amount</th>
+            <th class="py-4 px-4 whitespace-nowrap">Status</th>
+            <th class="py-4 px-4 whitespace-nowrap">Date</th>
+            <th class="py-4 px-4 text-center">Action</th>
           </tr>
         </thead>
+
+        <!-- Table Body -->
         <tbody class="divide-y divide-[#2d2d2d]">
-          <tr *ngFor="let order of orders" class="hover:bg-[#252525] transition-colors">
+
+          <tr
+            *ngFor="let order of filteredOrders"
+            class="hover:bg-[#252525] transition-colors">
+
+            <!-- Checkbox -->
             <td class="py-4 px-4">
-              <input type="checkbox" class="rounded bg-[#2a2a2a] border-[#3d3d3d] text-blue-600 focus:ring-0 cursor-pointer">
+              <input
+                type="checkbox"
+                class="rounded bg-[#2a2a2a] border-[#3d3d3d] text-blue-600 focus:ring-0 cursor-pointer">
             </td>
-            <td class="py-4 px-4 font-medium text-white underline cursor-pointer hover:text-gray-300" (click)="onView(order)">
-              {{ order.id }}
-            </td>
-            <td class="py-4 px-4 text-gray-300">{{ order.customer }}</td>
-            <td class="py-4 px-4 font-semibold text-white">{{ order.total }}</td>
+
+            <!-- Order ID -->
             <td class="py-4 px-4">
-              <span [ngClass]="{
-                'bg-emerald-950/50 text-emerald-400 border border-emerald-800/40': order.status === 'Completed',
-                'bg-amber-950/50 text-amber-400 border border-amber-800/40': order.status === 'Processing' || order.status === 'Pending',
-                'bg-blue-950/50 text-blue-400 border border-blue-800/40': order.status === 'Shipped'
-              }" class="px-2.5 py-1 text-[10px] font-medium rounded-full uppercase tracking-wider">
-                {{ order.status }}
+              <span
+                class="font-medium text-white underline cursor-pointer hover:text-blue-400"
+                (click)="onView(order)">
+                {{ order.order_number }}
               </span>
             </td>
-            <td class="py-4 px-4 text-gray-400">{{ order.date }}</td>
-            
-            <!-- Actions Column: View, Edit, Delete Buttons -->
-            <td class="py-4 px-4 text-center">
-              <div class="flex items-center justify-center space-x-2">
-                <!-- View Button -->
-                <button 
-                  (click)="onView(order)" 
-                  title="View Order"
-                  class="p-1.5 bg-[#2a2a2a] hover:bg-blue-900 text-gray-300 hover:text-white rounded transition-colors">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"></path>
-                    <circle cx="12" cy="12" r="3"></circle>
-                  </svg>
-                </button>
 
-                <!-- Edit Button -->
-                <button 
-                  (click)="onEdit(order)" 
-                  title="Edit Order"
-                  class="p-1.5 bg-[#2a2a2a] hover:bg-amber-900 text-gray-300 hover:text-white rounded transition-colors">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"></path>
-                  </svg>
-                </button>
+            <!-- Customer -->
+            <td class="py-4 px-4 text-gray-300 min-w-[180px]">
+              <div class="font-medium text-white">
+                {{ order.customer_name }}
+              </div>
 
-                <!-- Delete Button -->
-                <button 
-                  (click)="onDelete(order)" 
-                  title="Delete Order"
-                  class="p-1.5 bg-[#2a2a2a] hover:bg-rose-900 text-gray-300 hover:text-white rounded transition-colors">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"></path>
-                  </svg>
-                </button>
+              <div class="text-[10px] text-gray-500 mt-1">
+                {{ order.email }}
+              </div>
+
+              <div class="text-[10px] text-gray-500 mt-1">
+                {{ order.phone }}
               </div>
             </td>
+
+            <!-- Total -->
+            <td class="py-4 px-4 font-semibold text-white whitespace-nowrap">
+              {{ formatPrice(order.total) }}
+            </td>
+
+            <!-- Status Update -->
+            <td class="py-4 px-4">
+              <select
+                [value]="order.status"
+                (change)="updateStatus(order, $event)"
+                class="bg-[#161616] border border-[#3d3d3d] text-white text-[10px] uppercase tracking-wider px-2 py-2 rounded focus:outline-none focus:border-blue-500 cursor-pointer">
+
+                <option
+                  *ngFor="let status of statusOptions"
+                  [value]="status">
+                  {{ status | titlecase }}
+                </option>
+
+              </select>
+            </td>
+
+            <!-- Date -->
+            <td class="py-4 px-4 text-gray-400 whitespace-nowrap">
+              {{ order.created_at | date:'dd MMM yyyy' }}
+            </td>
+
+            <!-- Actions -->
+            <td class="py-4 px-4 text-center">
+              <div class="flex items-center justify-center space-x-2">
+
+                <!-- View -->
+                <button
+                  (click)="onView(order)"
+                  title="View Order"
+                  class="p-1.5 bg-[#2a2a2a] hover:bg-blue-900 text-gray-300 hover:text-white rounded transition-colors">
+
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z">
+                    </path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+
+                </button>
+
+              </div>
+            </td>
+
           </tr>
+
         </tbody>
+
       </table>
     </div>
 
-    <!-- Table Footer / Pagination -->
-    <div class="p-4 bg-[#161616] border-t border-[#2d2d2d] flex items-center justify-between text-xs text-gray-400">
-      <div>1-{{ orders.length }} of {{ orders.length }}</div>
-      <div class="flex items-center space-x-2">
-        <span>Per page:</span>
-        <select class="bg-[#1e1e1e] border border-[#2d2d2d] text-white px-2 py-1 rounded focus:outline-none">
-          <option>10</option>
-          <option>25</option>
-          <option>50</option>
-        </select>
+    <!-- Table Footer -->
+    <div class="p-4 bg-[#161616] border-t border-[#2d2d2d] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-400">
+
+      <div>
+        Showing {{ filteredOrders.length }} orders
       </div>
+
+      <div class="flex items-center gap-2">
+        <span>Per page:</span>
+
+        <span class="bg-[#1e1e1e] border border-[#2d2d2d] text-white px-3 py-1.5">
+          20
+        </span>
+      </div>
+
     </div>
+
   </div>
 
-  <!-- Conditional Empty State View: When No Orders Exist (Matching Screenshot) -->
-  <ng-template #emptyState>
-    <div class="bg-[#1e1e1e] border border-[#2d2d2d] rounded-none p-16 text-center">
-      <h3 class="text-base font-semibold text-white mb-1">No Results.</h3> 
-      <p class="text-xs text-gray-400">Either none exist or none match the filters you've specified above.</p> 
+  <!-- Empty State -->
+  <div
+    *ngIf="!loading && !errorMessage && filteredOrders.length === 0"
+    class="bg-[#1e1e1e] border border-[#2d2d2d] p-16 text-center">
+
+    <div class="flex justify-center mb-4">
+      <svg class="w-10 h-10 text-gray-600" fill="none"
+        stroke="currentColor" viewBox="0 0 24 24"
+        stroke-width="1.2">
+
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M3 7.5L12 3l9 4.5M3 7.5V17l9 4 9-4V7.5M3 7.5l9 4.5m9-4.5L12 12m0 0V21">
+        </path>
+
+      </svg>
     </div>
-  </ng-template>
+
+    <h3 class="text-base font-semibold text-white mb-1">
+      No Orders Found.
+    </h3>
+
+    <p class="text-xs text-gray-400">
+      Either no orders exist or none match your search.
+    </p>
+
+  </div>
 
 </div>

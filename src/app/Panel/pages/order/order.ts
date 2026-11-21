@@ -1,45 +1,113 @@
-import { Component } from '@angular/core';
+
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { Orderservice } from '../../../core/services/order/orderservice';
+import { Router } from '@angular/router';
 
 interface Orderdata {
-  id: string;
-  customer: string;
-  total: string;
+  id: number;
+  order_number: string;
+  customer_name: string;
+  email: string;
+  phone: string;
+  total: number;
   status: string;
-  date: string;
+  created_at: string;
+  items?: any[];
 }
 
 @Component({
   selector: 'app-order',
-  imports: [CommonModule, RouterModule],
+  standalone: true,
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './order.html',
   styleUrl: './order.css',
 })
-export class Order {
-  // Toggle this to `true` or populate array to see the populated order design
-  // Set to `[]` to see the empty "No Results" state matching your screenshot
-  orders: Orderdata[] = [
-    { id: '#ZQ-8492', customer: 'Ayesha Khan', total: 'PKR 14,500', status: 'Completed', date: '2026-03-30' },
-    { id: '#ZQ-8491', customer: 'Fatima Malik', total: 'PKR 28,000', status: 'Processing', date: '2026-03-29' },
-    { id: '#ZQ-8490', customer: 'Zainab Ahmed', total: 'PKR 9,500', status: 'Shipped', date: '2026-03-28' },
-    { id: '#ZQ-8489', customer: 'Usman Tariq', total: 'PKR 15,200', status: 'Pending', date: '2026-03-27' }
+export class Order implements OnInit {
+
+  private orderService = inject(Orderservice);
+
+  orders: Orderdata[] = [];
+
+  loading = false;
+  errorMessage = '';
+  searchTerm = '';
+
+  statusOptions = [
+    'pending',
+    'processing',
+    'shipped',
+    'completed',
+    'cancelled'
   ];
 
-  onCreateOrder() {
-    console.log('Navigate to Create Order page');
+  constructor(private cdr:ChangeDetectorRef){}
+
+  ngOnInit(): void {
+    this.loadOrders();
   }
 
-  onView(order: Orderdata) {
-    console.log('View order:', order);
+  loadOrders(): void {
+    this.loading = true;
+    this.errorMessage = '';
+
+    this.orderService.getAdminOrders().subscribe({
+      next: (response: any) => {
+        this.orders = response.data || [];
+        this.loading = false;
+this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error(error);
+        this.errorMessage = 'Unable to load orders.';
+        this.loading = false;
+      }
+    });
   }
 
-  onEdit(order: Orderdata) {
-    console.log('Edit order:', order);
+  updateStatus(order: Orderdata, event: Event): void {
+    const status = (event.target as HTMLSelectElement).value;
+
+    this.orderService.updateOrderStatus(order.id, status).subscribe({
+      next: () => {
+        order.status = status;
+      },
+      error: (error) => {
+        console.error(error);
+        alert('Unable to update order status.');
+        this.loadOrders();
+      }
+    });
   }
 
-  onDelete(order: Orderdata) {
-    console.log('Delete order:', order);
-    this.orders = this.orders.filter(o => o.id !== order.id);
+  get filteredOrders(): Orderdata[] {
+    const term = this.searchTerm.toLowerCase().trim();
+
+    if (!term) return this.orders;
+
+    return this.orders.filter(order =>
+      order.order_number?.toLowerCase().includes(term) ||
+      order.customer_name?.toLowerCase().includes(term) ||
+      order.email?.toLowerCase().includes(term) ||
+      order.phone?.toLowerCase().includes(term)
+    );
   }
+
+  formatPrice(price: number): string {
+    return 'PKR ' + Number(price || 0).toLocaleString('en-PK');
+  }
+
+  // onView(order: Orderdata): void {
+  //   console.log('View order:', order);
+
+  //   // We can connect this to an order detail page.
+  // }
+
+  private router = inject(Router);
+
+onView(order: any): void {
+  this.router.navigate(['/panel/orders', order.id]);
+}
 }

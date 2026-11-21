@@ -61,23 +61,23 @@
             <img
               [src]="img"
               [alt]="product.name"
-              class="w-full h-full object-cover object-center">
+              class="w-full h-full object-cover object-center object-top">
 
           </button>
 
         </div>
 
         <!-- Main Display Image -->
-        <div class="flex-1 order-1 sm:order-2 bg-[#f9f8f6] aspect-[3/4] overflow-hidden cursor-zoom-in relative group">
+        <div class="flex-1 order-1 sm:order-2 bg-[#efeeea] aspect-[3/4] overflow-hidden cursor-zoom-in relative group">
 
           <img
             [src]="selectedImage || 'assets/images/placeholder.webp'"
             [alt]="product.name"
             (click)="openLightbox()"
-            class="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105">
+            class="w-full h-full object-cover object-center object-top transition-transform duration-500 group-hover:scale-105">
 @if (product.sale_price && product.sale_price < product.regular_price) {
-  <span class="bg-red-500 font-semibold text-[13.9px] absolute top-1 left-1 w-8 h-8 py-1 px-1 rounded-2xl text-white">
-    {{ getDiscount(product.regular_price, product.sale_price) }}% 
+  <span class="bg-red-500 font-semibold text-[12.9px] absolute top-3 left-2  py-1 px-2 rounded-2xl text-white">
+   OFF {{ getDiscount(product.regular_price, product.sale_price) }}% 
   </span>
 }
           <div class="absolute bottom-3 right-3 bg-black/70 text-white text-[9px] uppercase tracking-widest px-2.5 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
@@ -211,7 +211,72 @@
         <!-- Add to Bag -->
         <div class="pt-2">
 
-          <button
+          <!-- Quantity Selector -->
+<div class="pt-4 space-y-3">
+
+  <span class="text-[10px] font-semibold tracking-[0.2em] uppercase">
+    Quantity
+  </span>
+
+  <div class="flex items-center border border-gray-300 w-fit">
+
+    <button
+      type="button"
+      (click)="decreaseQuantity()"
+      [disabled]="quantity <= 1"
+      class="w-11 h-11 flex items-center justify-center hover:bg-gray-100 disabled:opacity-30">
+      −
+    </button>
+
+    <span class="w-12 text-center text-sm font-medium">
+      {{ quantity }}
+    </span>
+
+    <button
+      type="button"
+      (click)="increaseQuantity()"
+      [disabled]="quantity >= product.stock_quantity"
+      class="w-11 h-11 flex items-center justify-center hover:bg-gray-100 disabled:opacity-30">
+      +
+    </button>
+
+  </div>
+
+  <p class="text-[10px] text-gray-500">
+    {{ product.stock_quantity }} items available
+  </p>
+
+</div>
+
+
+<!-- Purchase Buttons -->
+<div class="pt-3 space-y-3">
+
+  <!-- Add to Bag -->
+  <button
+    type="button"
+    (click)="addToBag()"
+    [disabled]="product.stock_quantity < 1"
+    class="w-full bg-[#111] hover:bg-black text-white py-4 text-[11px] font-semibold tracking-[0.2em] uppercase transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+
+    {{ product.stock_quantity < 1 ? 'Out of Stock' : 'Add to Bag' }}
+
+  </button>
+
+  <!-- Buy Now -->
+  <button
+    type="button"
+    (click)="buyNow()"
+    [disabled]="product.stock_quantity < 1"
+    class="w-full border border-black text-black hover:bg-black hover:text-white py-4 text-[11px] font-semibold tracking-[0.2em] uppercase transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+
+    Buy Now
+
+  </button>
+
+</div>
+
+          <!-- <button
             type="button"
             (click)="addToBag()"
             [disabled]="availability === 'Out of Stock'"
@@ -219,7 +284,7 @@
 
             {{ availability === 'In Stock' ? 'Add to Bag' : 'Out of Stock' }}
 
-          </button>
+          </button> -->
           
 
         </div>
@@ -231,9 +296,9 @@
 
        
         <!-- Description -->
-        <p class="text-xs leading-relaxed text-gray-700 max-w-md">
-          {{ product.description || 'Discover this piece from our collection.' }}
-        </p>
+          <p class="text-xs leading-relaxed text-gray-700 max-w-md whitespace-pre-line">
+  {{ product.description || 'Discover this piece from our collection.' }}
+</p>
 
       </div>
 
@@ -258,7 +323,7 @@
 
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-3 gap-6">
 
         <app-product-card
           *ngFor="let item of relatedProducts"

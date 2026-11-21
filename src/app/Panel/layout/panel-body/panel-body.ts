@@ -36,7 +36,7 @@ export class PanelBody {
     },
     error: () => {
       // Clear local session even if API fails
-      localStorage.removeItem('token');
+      localStorage.removeItem('khanibykhanam_token');
       localStorage.removeItem('user');
 
       this.router.navigate(['/login']);

@@ -34,7 +34,7 @@ export class Auth {
 
   // Get token
   getToken(): string | null {
-    return localStorage.getItem('dillzaar_token');
+    return localStorage.getItem('khanibykhanam_token');
   }
 
   // Get current user
@@ -60,7 +60,7 @@ export class Auth {
       tap(response => {
         if (response.token) {
           localStorage.setItem(
-            'dillzaar_token',
+            'khanibykhanam_token',
             response.token
           );
 
@@ -153,7 +153,7 @@ export class Auth {
 
   // Clear authentication
   clearAuth(): void {
-    localStorage.removeItem('dillzaar_token');
+    localStorage.removeItem('khanibykhanam_token');
     this.userSubject.next(null);
   }
 
@@ -163,13 +163,13 @@ export class Auth {
     switch (role) {
 
       case 'super_admin':
-        return '/panel/';
+        return '/panel';
 
       case 'admin':
-        return '/panel/dashboard';
+        return '/panel';
 
       case 'employee':
-        return '/panel/dashboard';
+        return '/panel';
 
       case 'client':
         return '/panel/dashboard';

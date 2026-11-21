@@ -1,1 +1,162 @@
-<p>footer works!</p>
+<footer class="bg-black text-white border-t border-neutral-900">
+  <!-- Newsletter Section -->
+  <div class="mx-auto max-w-2xl px-6 py-20 sm:py-24 text-center">
+    <p class="text-[11px] font-normal uppercase tracking-[0.22em] text-neutral-400">
+      LETTERS FROM
+    </p>
+
+    <h2 class="mt-5 font-serif text-4xl sm:text-5xl font-normal tracking-tight text-white leading-[1.12]">
+      New collections, quietly announced.
+    </h2>
+
+    <form
+      (submit)="onSubscribe($event)"
+      novalidate
+      class="mx-auto mt-10 max-w-xl"
+    >
+      <div class="flex items-center justify-between border-b border-neutral-700 focus-within:border-neutral-300 transition-colors pb-3">
+        <label for="footer-email" class="sr-only">Enter your email address</label>
+        <input
+          id="footer-email"
+          type="email"
+          name="email"
+          autocomplete="email"
+          placeholder="Enter your email address"
+          [ngModel]="email()"
+          (ngModelChange)="email.set($event)"
+          class="w-full bg-transparent text-sm text-white placeholder:text-neutral-500 focus:outline-none pr-4"
+        />
+
+        <button
+          type="submit"
+          class="inline-flex shrink-0 items-center gap-2 text-[11px] font-medium uppercase tracking-[0.18em] text-neutral-300 hover:text-white transition-colors cursor-pointer"
+        >
+          <span>SUBSCRIBE</span>
+          <span aria-hidden="true" class="text-sm leading-none">&rarr;</span>
+        </button>
+      </div>
+
+      @if (errorMessage()) {
+        <p class="mt-3 text-left text-xs text-red-400">{{ errorMessage() }}</p>
+      }
+      @if (subscribed()) {
+        <p class="mt-3 text-left text-xs text-neutral-300">
+          Thank you for subscribing to Letters from Lahore.
+        </p>
+      }
+    </form>
+  </div>
+
+  <!-- Divider -->
+  <div class="border-t border-neutral-900"></div>
+
+  <!-- Main Footer Columns -->
+  <div class="mx-auto max-w-7xl px-6 sm:px-10 py-14 sm:py-16">
+    <div class="grid grid-cols-1 gap-12 md:grid-cols-12 md:gap-8">
+      <!-- Brand Column -->
+      <div class="md:col-span-5 flex flex-col justify-between space-y-8 md:space-y-12">
+        <div>
+          <a
+            routerLink="/"
+            class="inline-block font-serif text-2xl sm:text-[26px] font-normal uppercase tracking-[0.16em] text-white"
+          >
+            <img src="khani by khanam footer logo.webp" alt="" width="150">
+          </a>
+          <p class="mt-4 max-w-xs text-xs leading-relaxed text-neutral-400">
+            A contemporary Pakistani fashion house celebrating local craft and timeless design.
+          </p>
+        </div>
+
+        <!-- Social Media Icons -->
+        <div class="flex items-center gap-5 text-neutral-500">
+          <!-- Instagram -->
+          <a
+            href="https://instagram.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Instagram"
+            class="hover:text-white transition-colors"
+          >
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+              <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+            </svg>
+          </a>
+
+          <!-- Facebook -->
+          <a
+            href="https://facebook.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Facebook"
+            class="hover:text-white transition-colors"
+          >
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+            </svg>
+          </a>
+
+          <!-- TikTok -->
+          <a
+            href="https://tiktok.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="TikTok"
+            class="hover:text-white transition-colors"
+          >
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+            </svg>
+          </a>
+
+          <!-- Pinterest -->
+          <a
+            href="https://pinterest.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Pinterest"
+            class="hover:text-white transition-colors"
+          >
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" x2="12" y1="8" y2="21" />
+              <path d="M8 20l4-9" />
+              <path d="M10.7 14c.437 1.263 1.43 2 2.55 2c2.071 0 3.75-1.554 3.75-4a5 5 0 1 0-9.7 1.7" />
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Navigation Columns -->
+      <div class="md:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-10">
+        @for (col of columns; track col.heading) {
+          <div>
+            <h3 class="text-[11px] font-medium uppercase tracking-[0.18em] text-neutral-300">
+              {{ col.heading }}
+            </h3>
+            <ul class="mt-5 space-y-3.5">
+              @for (link of col.links; track link.label) {
+                <li>
+                  <a
+                    [routerLink]="link.route"
+                    class="text-xs text-neutral-400 hover:text-white transition-colors"
+                  >
+                    {{ link.label }}
+                  </a>
+                </li>
+              }
+            </ul>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Legal & Region Bar -->
+  <div class="border-t border-neutral-900">
+    <div class="mx-auto max-w-7xl px-6 sm:px-10 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] uppercase tracking-[0.16em] text-neutral-500">
+      <p>&copy; 2025 Khani by Khanam. ALL RIGHTS RESERVED.</p>
+      <p>PKR &middot; PAKISTAN</p>
+    </div>
+  </div>
+</footer>

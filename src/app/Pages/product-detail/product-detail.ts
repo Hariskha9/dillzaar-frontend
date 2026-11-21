@@ -1,7 +1,7 @@
 
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, ActivatedRoute } from '@angular/router';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 
 import { ProductCard } from '../shared-compnent/product-card/product-card';
 
@@ -49,7 +49,8 @@ export class ProductDetail implements OnInit {
     private route: ActivatedRoute,
     private productService: Product,
     private cdr:ChangeDetectorRef,
-    private cartService: CartService
+    private cartService: CartService,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -352,6 +353,8 @@ export class ProductDetail implements OnInit {
           }));
 
         this.relatedLoading = false;
+                this.cdr.detectChanges()
+
       },
 
       error: (error) => {
@@ -419,5 +422,34 @@ export class ProductDetail implements OnInit {
   }
 
 
+increaseQuantity(): void {
+    if (!this.product) return;
+
+  if (this.quantity < this.product.stock_quantity) {
+    this.quantity++;
+  }
+}
+
+decreaseQuantity(): void {
+  if (this.quantity > 1) {
+    this.quantity--;
+  }
+}
+
+buyNow(): void {
+
+  if (!this.product) return;
+
+  const stock = this.product.stock_quantity ?? 0;
+
+  if (this.quantity < 1 || this.quantity > stock) {
+    return;
+  }
+
+  this.cartService.addToCart(this.product, this.quantity);
+
+  this.router.navigate(['/checkout']);
+
+}
   
 }

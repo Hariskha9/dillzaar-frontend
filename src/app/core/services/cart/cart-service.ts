@@ -29,6 +29,10 @@ private updateCartCount(): void {
   this.cartCountSubject.next(this.getTotalItems());
 }
 
+refreshCartCount(): void {
+  this.cartCountSubject.next(this.getTotalItems());
+}
+
   // Get cart from localStorage
   getCart(): CartItem[] {
     if (typeof localStorage === 'undefined') {

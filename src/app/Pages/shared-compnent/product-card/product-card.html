@@ -1,16 +1,16 @@
 <div class="group flex flex-col font-sans text-[#1a1a1a]">
   
   <!-- Image Container (3:4 Portrait Aspect Ratio) -->
-  <a [routerLink]="['/product', product.slug]" class="relative block  w-full overflow-hidden bg-[#eae8e3]">
+  <a [routerLink]="['/product', product.slug]" class="relative block aspect-3/4  w-full overflow-hidden bg-[#eae8e3]">
     <img 
-      [src]="product.image" 
+      [src]="product.image || product.featured_image" 
       [alt]="product.name"
-      class="w-full h-auto object-contain object-center transition-transform duration-700 ease-out group-hover:scale-105"
+      class="w-full h-full object-cover object-center object-top transition-transform duration-700 ease-out group-hover:scale-105"
     />
 
-@if (product.salePrice && product.salePrice < product.regularPrice) {
-  <span class="bg-red-500 font-semibold text-[13.9px] absolute top-1 left-1 w-8 h-8 py-1 px-1 rounded-2xl text-white">
-    {{ getDiscount(product.regularPrice, product.salePrice) }}% 
+@if (product.salePrice && product.salePrice < product.regularPrice || product.sale_price && product.sale_price < product.regular_price) {
+  <span class="bg-red-500 font-semibold text-[12.9px] absolute top-3 left-2  py-1 px-2 rounded-2xl text-white">
+    OFF {{ getDiscount(product.regular_price, product.sale_price) }}% 
   </span>
 }
     <!-- Top-Right Circular Wishlist Button -->
@@ -30,7 +30,16 @@
     </button>
 
     <!-- Bottom Hover Quick Add Bar -->
-    <div class="absolute inset-x-3 bottom-3 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+     <div class="absolute inset-x-3 bottom-3 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+      <button 
+        type="button"
+       
+        class="w-full bg-white/95 hover:bg-white text-[#111] py-2.5 px-4 flex items-center justify-between text-[10px] font-semibold tracking-[0.18em] uppercase shadow-sm">
+        <span>View</span> 
+        <span class="text-sm leading-none font-normal">+</span> 
+      </button>
+    </div>
+    <!-- <div class="absolute inset-x-3 bottom-3 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
       <button 
         type="button"
         (click)="onQuickAdd($event)"
@@ -38,13 +47,18 @@
         <span>Quick Add</span> 
         <span class="text-sm leading-none font-normal">+</span> 
       </button>
-    </div>
+    </div> -->
   </a>
 
   <!-- Centered Product Meta Below Image -->
   <div class="text-start pt-4 space-y-1">
     <p class="text-[9px] tracking-[0.2em] uppercase text-gray-400">
-      {{ product.category }}
+      @if(!product?.category?.name){
+            {{ product.category}}
+
+      }
+            {{product?.category?.name}}
+
     </p>
     <h3 class="text-md font-semibold font-serif text-[#111]">
       <a [routerLink]="['/product', product.slug]" class="hover:underline">
@@ -54,11 +68,17 @@
     <div class="flex  items-end">
       <p class="font-bold text-[15px] pr-1">RS:</p>
     <p class="text-[16px] font-bold tracking-wider text-gray-900 pr-2 ">
-      {{ product.salePrice | number:'1.0-2'}} 
+      {{ product.sale_price | number:'1.0-2'}} 
+            {{ product.salePrice | number:'1.0-2'}} 
+
+      
     </p>
     
     <p class="text-[12px] font-normal tracking-wider text-gray-700 line-through mb-[2px]">
-      {{ product.regularPrice | number:'1.0-2'}} 
+      {{ product.regular_price | number:'1.0-2'}} 
+            {{ product.regularPrice | number:'1.0-2'}} 
+
+      regularPrice
     </p>
     </div>
   </div>

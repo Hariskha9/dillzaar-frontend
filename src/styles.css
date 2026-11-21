@@ -1,3 +1,78 @@
 /* You can add global styles to this file, and also import other style files */
 
 @import 'tailwindcss';
+
+
+
+
+@media print {
+
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+
+  /* Hide dashboard elements */
+  body * {
+    visibility: hidden !important;
+  }
+
+  /* Show invoice only */
+  .invoice-document,
+  .invoice-document * {
+    visibility: visible !important;
+  }
+
+  /* Keep invoice in normal document flow */
+  .invoice-document {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+    color: #222 !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  /* Allow content to continue onto additional pages */
+  .invoice-table {
+    width: 100%;
+    border-collapse: collapse;
+    page-break-inside: auto;
+  }
+
+  .invoice-table tr {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .invoice-table thead {
+    display: table-header-group;
+  }
+
+  .invoice-table tfoot {
+    display: table-footer-group;
+  }
+
+  .invoice-top,
+  .invoice-status,
+  .invoice-addresses,
+  .invoice-totals,
+  .invoice-payment {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .invoice-product img {
+    max-width: 45px;
+    max-height: 50px;
+    object-fit: contain;
+  }
+}

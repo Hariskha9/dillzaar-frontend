@@ -50,8 +50,9 @@ export class Login {
         const dashboard = this.auth.getDashboardUrl(
           response.user.role
         );
-
+console.log(dashboard)
         this.router.navigateByUrl(dashboard);
+        this.cdr.detectChanges();
 
       },
 

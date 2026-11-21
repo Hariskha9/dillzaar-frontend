@@ -17,6 +17,9 @@ import { guestGuard } from './core/guards/guest/guest-guard';
 import { CategoryEdit } from './Panel/pages/categories/components/category-edit/category-edit';
 import { ProductDetail } from './Pages/product-detail/product-detail';
 import { Cart } from './Pages/cart/cart';
+import { AllProduct } from './Pages/all-product/all-product';
+import { Checkout } from './Pages/checkout/checkout';
+import { OrderDetail } from './Panel/pages/order/component/order-detail/order-detail';
 
 export const routes: Routes = [
      {
@@ -24,10 +27,18 @@ export const routes: Routes = [
     component: Body,
     children: [
       { path: '', component: Home },
+      {
+    path: 'products',
+   component: AllProduct
+  },
        { path: 'product/:slug', component: ProductDetail },
        {
   path: 'cart',
   component: Cart
+},
+{
+  path: 'checkout',
+  component: Checkout
 },
       {path:'login', component: Login,  canActivate: [guestGuard],}
     ]
@@ -60,6 +71,10 @@ export const routes: Routes = [
   component: CategoryEdit
  },
       {path:'orders', component:Order},
+      {
+  path: 'orders/:id',
+ component:OrderDetail
+},
       {path:'users', component:Users},
 
     ]

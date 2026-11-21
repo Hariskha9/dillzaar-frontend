@@ -439,7 +439,13 @@ formData.append(
 
         const media = response.data;
 
-        this.assignMedia(media);
+        if (!media?.url) {
+  this.errorMessage = 'Image URL was not returned.';
+  this.loading = false;
+  return;
+}
+
+        this.assignMedia(media.url);
 
         this.loading = false;
 
@@ -547,8 +553,6 @@ formData.append(
   selectExistingMedia(media: MediaItem): void {
 
     this.assignMedia(media.url);
-
-    this.closeDrawer();
 
   }
 
@@ -676,9 +680,14 @@ formData.append(
     );
   }
 
-  this.galleryPaths.forEach((path, index) => {
-    formData.append(`gallery_images[${index}]`, path);
-  });
+  // this.galleryPaths.forEach((path, index) => {
+  //   formData.append(`gallery_images[${index}]`, path);
+  // });
+
+    // Gallery image paths
+    this.galleryImages.forEach((image) => {
+      formData.append('gallery_images[]', image);
+    });
 
   this.loading = true;
 

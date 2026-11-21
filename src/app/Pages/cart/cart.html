@@ -31,7 +31,7 @@
         You haven't added any products to your bag yet.
       </p>
 
-      <a routerLink="/shop"
+      <a routerLink="/"
          class="mt-8 inline-block bg-black px-8 py-3 text-sm font-semibold text-white hover:bg-gray-800">
         Continue Shopping
       </a>
@@ -127,7 +127,7 @@
 
         <!-- Cart Actions -->
         <div class="flex justify-between pt-6">
-          <a routerLink="/shop"
+          <a routerLink="/products"
              class="text-sm font-medium underline underline-offset-4">
             Continue Shopping
           </a>
@@ -165,6 +165,7 @@
 
         <button
           type="button"
+          routerLink="/checkout"
           [disabled]="cartItems.length === 0"
           class="w-full bg-black py-4 text-sm font-semibold uppercase tracking-wider text-white hover:bg-gray-800 disabled:opacity-50">
           Proceed to Checkout
