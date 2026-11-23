@@ -39,6 +39,17 @@ export interface ApiResponse<T> {
   data: T;
 }
 
+
+export interface ProductFilters {
+  category: string;
+  fabric: string;
+  max_price: number;
+  sort: string;
+  page: number;
+  per_page: number;
+}
+
+
 @Injectable({
   providedIn: 'root',
 })
@@ -108,4 +119,28 @@ getProducts(page: number = 1, perPage: number = 15): Observable<any> {
       `${this.apiUrl}/${id}`
     );
   }
+
+
+  getPublicProductsfilter(filters: ProductFilters) {
+  let params = new HttpParams()
+    .set('page', filters.page)
+    .set('per_page', filters.per_page)
+    .set('sort', filters.sort);
+
+  if (filters.category !== 'all') {
+    params = params.set('category', filters.category);
+  }
+
+  if (filters.fabric !== 'all') {
+    params = params.set('fabric', filters.fabric);
+  }
+
+  params = params.set('max_price', filters.max_price);
+
+  return this.http.get<any>(
+    `${this.apiUrl}/products`,
+    { params }
+  );
+}
+
 }

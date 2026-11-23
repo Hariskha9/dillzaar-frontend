@@ -1,5 +1,5 @@
 
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 export interface CategoryFilterOption {
@@ -34,34 +34,47 @@ export class ProductFilterState {
   maxPrice = input<number>(20000);
 
   filterChange = output<ProductFilterStatedata>();
-  resetFilters = output<void>();
 
-  onCategorySelect(category: string): void {
-    this.filterChange.emit({
-      category,
-      fabric: this.selectedFabric(),
-      maxPrice: this.maxPrice(),
+  draftCategory = signal('all');
+  draftFabric = signal('all');
+  draftMaxPrice = signal(20000);
+
+  constructor() {
+    effect(() => {
+      this.draftCategory.set(this.selectedCategory());
+      this.draftFabric.set(this.selectedFabric());
+      this.draftMaxPrice.set(this.maxPrice());
     });
   }
 
-  onFabricSelectname(fabric: string): void {
-    this.filterChange.emit({
-      category: this.selectedCategory(),
-      fabric,
-      maxPrice: this.maxPrice(),
-    });
+  onCategorySelect(category: string): void {
+    this.draftCategory.set(category);
+  }
+
+  onFabricSelect(fabric: string): void {
+    this.draftFabric.set(fabric);
   }
 
   onPriceInput(event: Event): void {
     const value = Number((event.target as HTMLInputElement).value);
 
     if (!Number.isNaN(value)) {
-      this.filterChange.emit({
-        category: this.selectedCategory(),
-        fabric: this.selectedFabric(),
-        maxPrice: value,
-      });
+      this.draftMaxPrice.set(value);
     }
+  }
+
+  applyFilters(): void {
+    this.filterChange.emit({
+      category: this.draftCategory(),
+      fabric: this.draftFabric(),
+      maxPrice: this.draftMaxPrice(),
+    });
+  }
+
+  resetDraftFilters(): void {
+    this.draftCategory.set('all');
+    this.draftFabric.set('all');
+    this.draftMaxPrice.set(20000);
   }
 
   formatPkr(amount: number): string {

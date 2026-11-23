@@ -54,6 +54,11 @@ export class ProductDetail implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    window.scrollTo({
+  top: 0,
+  behavior: 'smooth'
+});
+
     this.route.paramMap.subscribe(params => {
       const slug = params.get('slug');
 
@@ -332,7 +337,7 @@ export class ProductDetail implements OnInit {
         // Exclude current product and get 3 related products
         this.relatedProducts = products
           .filter(item => item.id !== currentProductId)
-          .slice(0, 3)
+          .slice(0, 8)
           .map(item => ({
             id: item.id,
             name: item.name,

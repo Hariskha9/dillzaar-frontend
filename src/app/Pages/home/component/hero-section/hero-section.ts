@@ -59,8 +59,8 @@ export class HeroSection implements OnInit, OnDestroy {
       subtitle: 'Regal Florals Collection',
       ctaLabel: 'DISCOVER NOW',
       ctaRoute: '/collections/regal-florals',
-      desktopImage: 'khani by khanam Embroidered.webp',
-      mobileImage: 'khani by khanam Embroidered mobile.webp',
+      desktopImage: 'khani by khanam slide 2.webp',
+      mobileImage: 'khani by khanam slide 2 mobile.webp',
       alt: 'Premium Embroidered Khaddar Collection',
     },
     {
@@ -81,8 +81,8 @@ export class HeroSection implements OnInit, OnDestroy {
       subtitle: 'Midnight Blooms Collection',
       ctaLabel: 'VIEW COLLECTION',
       ctaRoute: '/collections/midnight-blooms',
-      desktopImage: 'khani by khanam Embroidered.webp',
-      mobileImage: 'khani by khanam Embroidered mobile.webp',
+      desktopImage: 'khani by khanam slide 2.webp',
+      mobileImage: 'khani by khanam slide 2 mobile.webp',
       alt: 'Khaddar 3 Piece Embroidered Collection',
     },
   ];

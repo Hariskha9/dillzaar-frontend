@@ -49,7 +49,7 @@ export class LatestArrivals implements OnInit {
             : [];
 
         // Display latest 6 products
-        this.products = productList.slice(0, 15).map((product: any) => ({
+        this.products = productList.slice(0, 16).map((product: any) => ({
 
           id: product.id,
 

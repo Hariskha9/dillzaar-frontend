@@ -6,6 +6,7 @@
   (touchend)="onTouchEnd($event)"
   class="relative w-full h-[85vh] min-h-[560px] max-h-[900px] overflow-hidden bg-neutral-950 select-none"
 >
+
   @for (slide of slides; track slide.id; let idx = $index) {
     @if (idx === currentIndex()) {
       <div class="relative h-full w-full">
@@ -13,14 +14,16 @@
         <img
           [src]="slide.desktopImage"
           [alt]="slide.alt"
+          fetchpriority="high"
           loading="eager"
-          class="hidden md:block h-full w-full object-cover object-center"
+          class="hidden md:block h-full w-full object-cover object-center "
         />
 
         <!-- Mobile / Tablet Portrait Image -->
         <img
           [src]="slide.mobileImage"
           [alt]="slide.alt"
+          fetchpriority="high"
           loading="eager"
           class="block md:hidden h-full w-full object-cover object-top"
         />
