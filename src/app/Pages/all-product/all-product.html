@@ -44,14 +44,21 @@
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         <div class="lg:col-span-3">
-         <app-product-filter-state
+        <app-product-filter-state
   [categories]="categories()"
+  [types]="types()"
   [fabrics]="fabricOptions()"
+  [collections]="collections()"
+  [seasons]="seasons()"
+
   [selectedCategory]="selectedCategory()"
+  [selectedType]="selectedType()"
   [selectedFabric]="selectedFabric()"
+  [selectedCollection]="selectedCollection()"
+  [selectedSeason]="selectedSeason()"
   [maxPrice]="maxPrice()"
+
   (filterChange)="onFilterChange($event)"
-  (resetFilters)="resetFilters()"
 />
         </div>
 

@@ -6,6 +6,7 @@ import { TypeData } from '../type/typeservice';
 import { FabricData } from '../fabric/fabricservice';
 import { CollectionData } from '../collection/collectionservice';
 import { SeasonData } from '../season/seasonservice';
+import { ProductFilterStatedata } from '../../../Pages/shared-compnent/product-filter-state/product-filter-state';
 
 export interface Productdata {
   id?: number;
@@ -83,15 +84,39 @@ getProducts(page: number = 1, perPage: number = 15): Observable<any> {
   }
 
   // Get active products (Public)
-  getPublicProducts(page: number = 1): Observable<any> {
-    const params = new HttpParams()
-      .set('page', page);
+  // getPublicProducts(page: number = 1): Observable<any> {
+  //   const params = new HttpParams()
+  //     .set('page', page);
 
-    return this.http.get<any>(
-      `${environment.apiUrl}/store/products`,
-      { params }
-    );
+  //   return this.http.get<any>(
+  //     `${environment.apiUrl}/store/products`,
+  //     { params }
+  //   );
+  // }
+
+  getPublicProducts(
+  page: number = 1,
+  filters?: ProductFilterStatedata
+) {
+  let params = new HttpParams()
+    .set('page', page)
+    .set('per_page', 16);
+
+  if (filters) {
+    params = params
+      .set('category', filters.category)
+      .set('type', filters.type)
+      .set('fabric', filters.fabric)
+      .set('collection', filters.collection)
+      .set('season', filters.season)
+      .set('max_price', filters.maxPrice);
   }
+
+  return this.http.get<any>(
+    `${environment.apiUrl}/store/products`,
+    { params }
+  );
+}
 
   // Create product
   createProduct(formData: FormData): Observable<ApiResponse<Product>> {

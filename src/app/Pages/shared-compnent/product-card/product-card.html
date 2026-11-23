@@ -1,7 +1,7 @@
 <div class="group flex flex-col font-sans text-[#1a1a1a]">
   
   <!-- Image Container (3:4 Portrait Aspect Ratio) -->
-  <a [routerLink]="['/product', product.slug]" class="relative block aspect-3/4  w-full overflow-hidden bg-[#eae8e3]">
+  <a [routerLink]="['/product', product.slug]" [state]="{ product: product }" class="relative block aspect-3/4  w-full overflow-hidden bg-[#eae8e3]">
     <img 
       [src]="product.image || product.featured_image" 
         [srcset]="
@@ -76,7 +76,7 @@
 
     </p>
     <h3 class="text-md font-semibold font-serif text-[#111]">
-      <a [routerLink]="['/product', product.slug]" class="hover:underline">
+      <a [routerLink]="['/product', product.slug]" [state]="{ product: product }" class="hover:underline">
         {{ product.name }} 
       </a>
     </h3>

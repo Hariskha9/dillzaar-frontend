@@ -58,8 +58,21 @@ export class ProductDetail implements OnInit {
   top: 0,
   behavior: 'smooth'
 });
+    const navigationProduct = history.state?.product;
 
-    this.route.paramMap.subscribe(params => {
+ if (navigationProduct) {
+
+      // Product came from product card
+      this.product = navigationProduct;
+              this.selectedImage = this.productImages[0] || '';
+
+      this.loading = false;
+      this.cdr.detectChanges()
+console.log('state', this.product)
+    } else {
+
+      // Direct URL access: fetch product from API
+       this.route.paramMap.subscribe(params => {
       const slug = params.get('slug');
 
       if (slug) {
@@ -69,6 +82,9 @@ export class ProductDetail implements OnInit {
         this.errorMessage = 'Product not found.';
       }
     });
+
+    }
+
   }
 
   // Load product using slug
@@ -366,6 +382,8 @@ export class ProductDetail implements OnInit {
         console.error('Related products error:', error);
         this.relatedProducts = [];
         this.relatedLoading = false;
+                        this.cdr.detectChanges()
+
       }
     });
   }

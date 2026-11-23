@@ -51,30 +51,8 @@ export class LatestArrivals implements OnInit {
         // Display latest 6 products
         this.products = productList.slice(0, 16).map((product: any) => ({
 
-          id: product.id,
+            ...product,
 
-          name: product.name,
-
-          category: (
-            product.category?.name || 'Uncategorized'
-          ).toUpperCase(),
-
-          price: this.formatPrice(
-            product.sale_price && Number(product.sale_price) > 0
-              ? product.sale_price
-              : product.regular_price
-          ),
-
-          regularPrice: product.regular_price,
-
-          salePrice: product.sale_price,
-
-          image:
-            product.featured_image_url ||
-            product.featured_image ||
-            'assets/images/placeholder.webp',
-
-          slug: product.slug,
 
           isWishlisted: false
 

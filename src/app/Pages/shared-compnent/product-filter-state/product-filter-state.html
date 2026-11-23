@@ -1,5 +1,87 @@
 
-<aside aria-label="Product Filters" class="space-y-8">
+<!-- Mobile Filter Button -->
+<div class="mb-5 flex justify-end lg:hidden">
+  <button
+    type="button"
+    (click)="openMobileFilter()"
+    class="flex items-center gap-2 border border-neutral-300 px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-900"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.7"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M4 7h16M7 12h10m-7 5h4" />
+    </svg>
+    Filters
+  </button>
+</div>
+
+<!-- Desktop Sidebar -->
+<aside
+  aria-label="Product Filters"
+  class="hidden space-y-8 lg:block"
+>
+  <ng-container *ngTemplateOutlet="filterContent"></ng-container>
+</aside>
+
+<!-- Mobile Overlay -->
+@if (isMobileFilterOpen()) {
+  <div
+    class="fixed inset-0 z-[100] bg-black/50 lg:hidden"
+    (click)="closeMobileFilter()"
+  ></div>
+}
+
+<!-- Mobile Slide Drawer -->
+<div
+  class="fixed inset-y-0 right-0 z-[101] flex h-full w-[88%] max-w-[380px] flex-col bg-white shadow-2xl transition-transform duration-300 ease-in-out lg:hidden"
+  [class.translate-x-0]="isMobileFilterOpen()"
+  [class.translate-x-full]="!isMobileFilterOpen()"
+  [attr.aria-hidden]="!isMobileFilterOpen()"
+  [attr.inert]="!isMobileFilterOpen() ? '' : null"
+>
+  <!-- Drawer Header -->
+  <div class="flex items-center justify-between border-b border-neutral-200 px-6 py-5">
+    <h2 class="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-900">
+      Filters
+    </h2>
+
+    <button
+      type="button"
+      (click)="closeMobileFilter()"
+      aria-label="Close filters"
+      class="flex h-9 w-9 items-center justify-center text-neutral-700 hover:bg-neutral-100"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.7"
+        stroke-linecap="round"
+      >
+        <path d="m18 6-12 12M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Drawer Content -->
+  <div class="flex-1 overflow-y-auto px-6 py-7">
+    <ng-container *ngTemplateOutlet="filterContent"></ng-container>
+  </div>
+</div>
+
+<!-- Shared Filter Content -->
+<ng-template #filterContent>
 
   <!-- Category -->
   <div>
@@ -8,26 +90,25 @@
     </h2>
 
     <div class="mt-4 space-y-2.5 text-xs text-neutral-700">
-
-      <label class="flex items-center gap-2.5 cursor-pointer">
+      <label class="flex cursor-pointer items-center gap-2.5">
         <input
           type="radio"
           name="categoryFilter"
           [checked]="draftCategory() === 'all'"
           (change)="onCategorySelect('all')"
-          class="h-3.5 w-3.5 accent-neutral-900 cursor-pointer"
+          class="h-3.5 w-3.5 accent-neutral-900"
         />
         <span>All</span>
       </label>
 
       @for (cat of categories(); track cat.slug) {
-        <label class="flex items-center gap-2.5 cursor-pointer">
+        <label class="flex cursor-pointer items-center gap-2.5">
           <input
             type="radio"
             name="categoryFilter"
             [checked]="draftCategory() === cat.slug"
             (change)="onCategorySelect(cat.slug)"
-            class="h-3.5 w-3.5 accent-neutral-900 cursor-pointer"
+            class="h-3.5 w-3.5 accent-neutral-900"
           />
           <span>{{ cat.name }}</span>
         </label>
@@ -35,36 +116,140 @@
     </div>
   </div>
 
+  <!-- Type -->
+  @if (types().length > 0) {
+    <div class="mt-7 border-t border-neutral-200 pt-6">
+      <h2 class="text-[10px] font-semibold uppercase tracking-[0.24em] text-neutral-900">
+        TYPE
+      </h2>
+
+      <div class="mt-4 space-y-2.5 text-xs text-neutral-700">
+        <label class="flex cursor-pointer items-center gap-2.5">
+          <input
+            type="radio"
+            name="typeFilter"
+            [checked]="draftType() === 'all'"
+            (change)="onTypeSelect('all')"
+            class="h-3.5 w-3.5 accent-neutral-900"
+          />
+          <span>All</span>
+        </label>
+
+        @for (item of types(); track item.id) {
+          <label class="flex cursor-pointer items-center gap-2.5">
+            <input
+              type="radio"
+              name="typeFilter"
+              [checked]="draftType() === item.slug"
+              (change)="onTypeSelect(item.slug)"
+              class="h-3.5 w-3.5 accent-neutral-900"
+            />
+            <span>{{ item.name }}</span>
+          </label>
+        }
+      </div>
+    </div>
+  }
+
   <!-- Fabric -->
   @if (fabrics().length > 0) {
-    <div class="border-t border-neutral-200 pt-6">
+    <div class="mt-7 border-t border-neutral-200 pt-6">
       <h2 class="text-[10px] font-semibold uppercase tracking-[0.24em] text-neutral-900">
         FABRIC
       </h2>
 
       <div class="mt-4 space-y-2.5 text-xs text-neutral-700">
-
-        <label class="flex items-center gap-2.5 cursor-pointer">
+        <label class="flex cursor-pointer items-center gap-2.5">
           <input
             type="radio"
             name="fabricFilter"
             [checked]="draftFabric() === 'all'"
             (change)="onFabricSelect('all')"
-            class="h-3.5 w-3.5 accent-neutral-900 cursor-pointer"
+            class="h-3.5 w-3.5 accent-neutral-900"
           />
           <span>All</span>
         </label>
 
-        @for (fab of fabrics(); track fab.id) {
-          <label class="flex items-center gap-2.5 cursor-pointer">
+        @for (item of fabrics(); track item.id) {
+          <label class="flex cursor-pointer items-center gap-2.5">
             <input
               type="radio"
               name="fabricFilter"
-              [checked]="draftFabric() === fab.slug"
-              (change)="onFabricSelect(fab.slug)"
-              class="h-3.5 w-3.5 accent-neutral-900 cursor-pointer"
+              [checked]="draftFabric() === item.slug"
+              (change)="onFabricSelect(item.slug)"
+              class="h-3.5 w-3.5 accent-neutral-900"
             />
-            <span>{{ fab.name }}</span>
+            <span>{{ item.name }}</span>
+          </label>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Collection -->
+  @if (collections().length > 0) {
+    <div class="mt-7 border-t border-neutral-200 pt-6">
+      <h2 class="text-[10px] font-semibold uppercase tracking-[0.24em] text-neutral-900">
+        COLLECTION
+      </h2>
+
+      <div class="mt-4 space-y-2.5 text-xs text-neutral-700">
+        <label class="flex cursor-pointer items-center gap-2.5">
+          <input
+            type="radio"
+            name="collectionFilter"
+            [checked]="draftCollection() === 'all'"
+            (change)="onCollectionSelect('all')"
+            class="h-3.5 w-3.5 accent-neutral-900"
+          />
+          <span>All</span>
+        </label>
+
+        @for (item of collections(); track item.id) {
+          <label class="flex cursor-pointer items-center gap-2.5">
+            <input
+              type="radio"
+              name="collectionFilter"
+              [checked]="draftCollection() === item.slug"
+              (change)="onCollectionSelect(item.slug)"
+              class="h-3.5 w-3.5 accent-neutral-900"
+            />
+            <span>{{ item.name }}</span>
+          </label>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Season -->
+  @if (seasons().length > 0) {
+    <div class="mt-7 border-t border-neutral-200 pt-6">
+      <h2 class="text-[10px] font-semibold uppercase tracking-[0.24em] text-neutral-900">
+        SEASON
+      </h2>
+
+      <div class="mt-4 space-y-2.5 text-xs text-neutral-700">
+        <label class="flex cursor-pointer items-center gap-2.5">
+          <input
+            type="radio"
+            name="seasonFilter"
+            [checked]="draftSeason() === 'all'"
+            (change)="onSeasonSelect('all')"
+            class="h-3.5 w-3.5 accent-neutral-900"
+          />
+          <span>All</span>
+        </label>
+
+        @for (item of seasons(); track item.id) {
+          <label class="flex cursor-pointer items-center gap-2.5">
+            <input
+              type="radio"
+              name="seasonFilter"
+              [checked]="draftSeason() === item.slug"
+              (change)="onSeasonSelect(item.slug)"
+              class="h-3.5 w-3.5 accent-neutral-900"
+            />
+            <span>{{ item.name }}</span>
           </label>
         }
       </div>
@@ -72,13 +257,13 @@
   }
 
   <!-- Price -->
-  <div class="border-t border-neutral-200 pt-6">
+  <div class="mt-7 border-t border-neutral-200 pt-6">
     <h2 class="text-[10px] font-semibold uppercase tracking-[0.24em] text-neutral-900">
       PRICE
     </h2>
 
     <p class="mt-3 text-[11px] font-medium tracking-wide text-neutral-600">
-      PKR 0 — {{ formatPkr(draftMaxPrice()) }}
+      {{ formatPkr(draftMaxPrice()) }}
     </p>
 
     <input
@@ -89,14 +274,17 @@
       [value]="draftMaxPrice()"
       (input)="onPriceInput($event)"
       aria-label="Maximum price filter"
-      class="mt-3 w-full accent-neutral-900 cursor-pointer"
+      class="mt-3 w-full cursor-pointer accent-neutral-900"
     />
+  </div>
 
-    <div class="mt-5 flex flex-col gap-3">
+
+  <div class="border-t border-neutral-200 bg-white px-6 py-5">
+    <div class="flex flex-col gap-3">
       <button
         type="button"
         (click)="applyFilters()"
-        class="w-full bg-neutral-900 px-5 py-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-white hover:bg-neutral-700 transition cursor-pointer"
+        class="w-full bg-neutral-900 px-5 py-3.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-white transition hover:bg-neutral-700"
       >
         Apply Filters
       </button>
@@ -104,11 +292,35 @@
       <button
         type="button"
         (click)="resetDraftFilters()"
-        class="text-[10px] font-medium uppercase tracking-[0.2em] text-neutral-500 underline underline-offset-4 hover:text-neutral-900 cursor-pointer"
+        class="text-center text-[10px] font-medium uppercase tracking-[0.2em] text-neutral-500 underline underline-offset-4 hover:text-neutral-900"
       >
         Clear Selection
       </button>
     </div>
   </div>
 
-</aside>
+
+</ng-template>
+
+<!-- Mobile Drawer Footer -->
+<!-- @if (isMobileFilterOpen()) {
+  <div class="border-t border-neutral-200 bg-white px-6 py-5">
+    <div class="flex flex-col gap-3">
+      <button
+        type="button"
+        (click)="applyFilters()"
+        class="w-full bg-neutral-900 px-5 py-3.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-white transition hover:bg-neutral-700"
+      >
+        Apply Filters
+      </button>
+
+      <button
+        type="button"
+        (click)="resetDraftFilters()"
+        class="text-center text-[10px] font-medium uppercase tracking-[0.2em] text-neutral-500 underline underline-offset-4 hover:text-neutral-900"
+      >
+        Clear Selection
+      </button>
+    </div>
+  </div>
+} -->

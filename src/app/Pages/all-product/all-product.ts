@@ -25,6 +25,12 @@ interface Fabric {
   slug: string;
 }
 
+interface FilterOption {
+  id: number;
+  name: string;
+  slug: string;
+}
+
 @Component({
   selector: 'app-all-product',
   imports: [CommonModule, ProductFilterState, ProductCard],
@@ -43,32 +49,74 @@ export class AllProduct implements OnInit{
   lastPage = signal<number>(1);
   totalCount = signal<number>(0);
 
-  selectedCategory = signal<string>('all');
+ selectedCategory = signal<string>('all');
+selectedType = signal<string>('all');
 selectedFabric = signal<string>('all');
+selectedCollection = signal<string>('all');
+selectedSeason = signal<string>('all');
+
   maxPrice = signal<number>(20000);
   sortBy = signal<SortOption>('featured');
   wishlistIds = signal<Set<number>>(new Set());
 
-  categories = computed<CategoryFilterOption[]>(() => {
-    const map = new Map<string, string>();
-    for (const p of this.products()) {
-      if (p.category?.slug && p.category?.name) {
-        map.set(p.category.slug, p.category.name);
-      }
-    }
-    return Array.from(map.entries()).map(([slug, name]) => ({ slug, name }));
-  });
+  categories = computed<FilterOption[]>(() => {
+  const map = new Map<string, FilterOption>();
 
-  fabricOptions = computed<Fabric[]>(() => {
-  const map = new Map<string, Fabric>();
+  for (const p of this.products()) {
+    if (p.category?.id && p.category?.name && p.category?.slug) {
+      map.set(p.category.slug, {
+        id: p.category.id,
+        name: p.category.name,
+        slug: p.category.slug,
+      });
+    }
+  }
+
+  return Array.from(map.values());
+});
+
+types = computed<FilterOption[]>(() => {
+  const map = new Map<string, FilterOption>();
+
+  for (const p of this.products()) {
+    if (p.type?.id && p.type?.name && p.type?.slug) {
+      map.set(p.type.slug, p.type);
+    }
+  }
+
+  return Array.from(map.values());
+});
+
+fabricOptions = computed<FilterOption[]>(() => {
+  const map = new Map<string, FilterOption>();
 
   for (const p of this.products()) {
     if (p.fabric?.id && p.fabric?.name && p.fabric?.slug) {
-      map.set(p.fabric.slug, {
-        id: p.fabric.id,
-        name: p.fabric.name,
-        slug: p.fabric.slug,
-      });
+      map.set(p.fabric.slug, p.fabric);
+    }
+  }
+
+  return Array.from(map.values());
+});
+
+collections = computed<FilterOption[]>(() => {
+  const map = new Map<string, FilterOption>();
+
+  for (const p of this.products()) {
+    if (p.collection?.id && p.collection?.name && p.collection?.slug) {
+      map.set(p.collection.slug, p.collection);
+    }
+  }
+
+  return Array.from(map.values());
+});
+
+seasons = computed<FilterOption[]>(() => {
+  const map = new Map<string, FilterOption>();
+
+  for (const p of this.products()) {
+    if (p.season?.id && p.season?.name && p.season?.slug) {
+      map.set(p.season.slug, p.season);
     }
   }
 
@@ -78,37 +126,19 @@ selectedFabric = signal<string>('all');
  
 
   filteredProducts = computed<Productdata[]>(() => {
-  const cat = this.selectedCategory();
-  const fab = this.selectedFabric();
-  const ceiling = this.maxPrice();
+  const list = [...this.products()];
   const sort = this.sortBy();
 
-  let list = this.products().filter((p) => {
-    if (cat !== 'all' && p.category?.slug !== cat) {
-      return false;
-    }
-
-    if (fab !== 'all' && p.fabric?.slug !== fab) {
-      return false;
-    }
-
-    if (this.getEffectivePrice(p) > ceiling) {
-      return false;
-    }
-
-    return true;
-  });
-
   if (sort === 'price-asc') {
-    list = [...list].sort(
+    list.sort(
       (a, b) => this.getEffectivePrice(a) - this.getEffectivePrice(b)
     );
   } else if (sort === 'price-desc') {
-    list = [...list].sort(
+    list.sort(
       (a, b) => this.getEffectivePrice(b) - this.getEffectivePrice(a)
     );
   } else if (sort === 'newest') {
-    list = [...list].sort((a, b) => (b.id ?? 0) - (a.id ?? 0));
+    list.sort((a, b) => (b.id ?? 0) - (a.id ?? 0));
   }
 
   return list;
@@ -119,48 +149,71 @@ selectedFabric = signal<string>('all');
   }
 
   loadPage(page: number): void {
-    if (page < 1) return;
-    this.loading.set(true);
-    this.errorMessage.set(null);
+  if (page < 1) return;
 
-    this.productService.getPublicProducts(page).subscribe({
-      next: (res) => {
-        const paginated = res?.data;
-        const items: Productdata[] = Array.isArray(paginated?.data)
-          ? paginated.data
-          : [];
-          console.log('allp',items)
-        this.products.set(items);
-        this.currentPage.set(paginated?.current_page ?? page);
-        this.lastPage.set(paginated?.last_page ?? 1);
-        this.totalCount.set(paginated?.total ?? items.length);
-        this.loading.set(false);
+  this.loading.set(true);
+  this.errorMessage.set(null);
 
-        if (isPlatformBrowser(this.platformId)) {
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-      },
-      error: () => {
-        this.errorMessage.set(
-          'Unable to load products right now. Please try again.'
-        );
-        this.loading.set(false);
-      },
-    });
-  }
+  const filters: ProductFilterStatedata = {
+    category: this.selectedCategory(),
+    type: this.selectedType(),
+    fabric: this.selectedFabric(),
+    collection: this.selectedCollection(),
+    season: this.selectedSeason(),
+    maxPrice: this.maxPrice(),
+  };
+
+  this.productService.getPublicProducts(page, filters).subscribe({
+    next: (res) => {
+      const paginated = res?.data;
+
+      const items: Productdata[] = Array.isArray(paginated?.data)
+        ? paginated.data
+        : [];
+
+      this.products.set(items);
+      this.currentPage.set(paginated?.current_page ?? page);
+      this.lastPage.set(paginated?.last_page ?? 1);
+      this.totalCount.set(paginated?.total ?? items.length);
+
+      this.loading.set(false);
+
+      if (isPlatformBrowser(this.platformId)) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    },
+    error: () => {
+      this.errorMessage.set(
+        'Unable to load products right now. Please try again.'
+      );
+
+      this.loading.set(false);
+    },
+  });
+}
 
   onFilterChange(state: ProductFilterStatedata): void {
-    this.selectedCategory.set(state.category);
-    this.selectedFabric.set(state.fabric);
-    this.maxPrice.set(state.maxPrice);
-  }
+  this.selectedCategory.set(state.category);
+  this.selectedType.set(state.type);
+  this.selectedFabric.set(state.fabric);
+  this.selectedCollection.set(state.collection);
+  this.selectedSeason.set(state.season);
+  this.maxPrice.set(state.maxPrice);
 
-  resetFilters(): void {
-    this.selectedCategory.set('all');
-        this.selectedFabric.set('all');
-    this.maxPrice.set(20000);
-    this.sortBy.set('featured');
-  }
+  this.loadPage(1);
+}
+
+ resetFilters(): void {
+  this.selectedCategory.set('all');
+  this.selectedType.set('all');
+  this.selectedFabric.set('all');
+  this.selectedCollection.set('all');
+  this.selectedSeason.set('all');
+  this.maxPrice.set(20000);
+  this.sortBy.set('featured');
+
+  this.loadPage(1);
+}
 
   onSortChange(event: Event): void {
     const value = (event.target as HTMLSelectElement).value as SortOption;
