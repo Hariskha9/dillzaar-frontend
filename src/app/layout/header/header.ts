@@ -20,12 +20,12 @@ export class Header implements OnInit , OnDestroy {
   navItems = [
     { label: 'Home', route: '/' },
     { label: 'All Products', route: '/products' },
-    { label: 'Three Piece', route: '/ready-to-wear' },
-    { label: 'Two  Piece', route: '/festive' },
-    { label: 'Embroidery', route: '/shop-all' },
-    { label: 'JOURNAL', route: '/journal' },
-    { label: 'OUR STORY', route: '/our-story' },
-    { label: 'CONTACT', route: '/contact' },
+    { label: 'Three Piece', route: '/products/3-piece' },
+    { label: 'Two  Piece', route: '/products/2-piece' },
+    // { label: 'Embroidery', route: '/shop-all' },
+    { label: 'About Us', route: '/about-us' },
+    // { label: 'OUR STORY', route: '/our-story' },
+    { label: 'CONTACT', route: '/contact-us' },
     { label: 'MY ACCOUNT', route: '/panel' }
   ];
 

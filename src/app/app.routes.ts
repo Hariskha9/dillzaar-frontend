@@ -20,6 +20,8 @@ import { Cart } from './Pages/cart/cart';
 import { AllProduct } from './Pages/all-product/all-product';
 import { Checkout } from './Pages/checkout/checkout';
 import { OrderDetail } from './Panel/pages/order/component/order-detail/order-detail';
+import { AboutUs } from './Pages/about-us/about-us';
+import { ContactUs } from './Pages/contact-us/contact-us';
 
 export const routes: Routes = [
      {
@@ -27,11 +29,28 @@ export const routes: Routes = [
     component: Body,
     children: [
       { path: '', component: Home },
+        {
+    path: 'about-us',
+    component: AboutUs,
+  },
+  
+
+  {
+    path: 'contact-us',
+    component: ContactUs,
+  },
       {
     path: 'products',
    component: AllProduct
   },
        { path: 'product/:slug', component: ProductDetail },
+
+         {
+    path: 'products/:slug',
+    loadComponent: () =>
+      import('./Pages/product-categories/product-categories')
+        .then(m => m.ProductCategories),
+  },
        {
   path: 'cart',
   component: Cart

@@ -21,6 +21,8 @@ export class ProductCard {
   return `https://khanibykhanam.pk/api/storage/app/public/${image}`;
 }
 
+
+
   onToggleWishlist(event: Event) {
     event.stopPropagation();
     event.preventDefault();

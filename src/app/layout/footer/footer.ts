@@ -29,30 +29,31 @@ export class Footer {
     {
       heading: 'SHOP',
       links: [
-        { label: 'New arrivals', route: '/shop/new-arrivals' },
-        { label: 'Luxury lawn', route: '/shop/luxury-lawn' },
-        { label: 'Ready to wear', route: '/shop/ready-to-wear' },
-        { label: 'Festive', route: '/shop/festive' },
+        { label: 'Home', route: '/' },
+        { label: 'All product', route: '/products' },
+        { label: 'Two Piece', route: '/products/2-piece' },
+        { label: 'Three Piece', route: '/products/3-piece' },
       ],
     },
     {
       heading: 'HELP',
       links: [
-        { label: 'Contact us', route: '/contact' },
+        { label: 'About us', route: '/about-us' },
+        { label: 'Contact us', route: '/contact-us' },
         { label: 'Shopping bag', route: '/bag' },
         { label: 'Checkout', route: '/checkout' },
-        { label: 'My orders', route: '/orders' },
+        // { label: 'My orders', route: '/orders' },
       ],
     },
-    {
-      heading: 'ABOUT',
-      links: [
-        { label: 'Our story', route: '/about/our-story' },
-        { label: 'Journal', route: '/journal' },
-        { label: 'Craftsmanship', route: '/about/craftsmanship' },
-        { label: 'Store admin', route: '/admin' },
-      ],
-    },
+    // {
+    //   heading: 'ABOUT',
+    //   links: [
+    //     { label: 'Our story', route: '/about/our-story' },
+    //     { label: 'Journal', route: '/journal' },
+    //     { label: 'Craftsmanship', route: '/about/craftsmanship' },
+    //     { label: 'Store admin', route: '/admin' },
+    //   ],
+    // },
   ];
 
   onSubscribe(event: Event): void {

@@ -1,0 +1,294 @@
+
+<div class="min-h-screen bg-[#f8f7f4] text-[#1a1a1a] font-sans">
+
+  <!-- Hero -->
+  <section class="px-5 sm:px-8 lg:px-12 pt-16 pb-14 lg:pt-24 lg:pb-20">
+    <div class="max-w-7xl mx-auto text-center">
+      <p class="text-[10px] uppercase tracking-[0.3em] text-neutral-500 mb-5">
+        We'd Love To Hear From You
+      </p>
+
+      <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl tracking-tight">
+        Contact Us
+      </h1>
+
+      <p class="max-w-xl mx-auto mt-6 text-sm leading-7 text-neutral-500">
+        Whether you have a question about an order, our collections, or
+        anything else, we're here to help. Get in touch with us.
+      </p>
+    </div>
+  </section>
+
+  <!-- Contact Content -->
+  <section class="px-5 sm:px-8 lg:px-12 pb-20">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
+
+      <!-- Contact Information -->
+      <div class="lg:col-span-4">
+        <div class="bg-[#191919] text-white p-8 sm:p-10 h-full">
+
+          <p class="text-[10px] uppercase tracking-[0.25em] text-neutral-400">
+            Get In Touch
+          </p>
+
+          <h2 class="font-serif text-3xl mt-5">
+            We'd love to connect.
+          </h2>
+
+          <p class="text-xs text-neutral-400 leading-7 mt-5">
+            Have a question or need assistance? Reach out to us through
+            any of the contact details below.
+          </p>
+
+          <div class="mt-12 space-y-9">
+
+            <!-- Email -->
+            <div class="flex gap-4">
+              <div class="text-neutral-400 text-lg">✉</div>
+              <div>
+                <h3 class="text-[10px] uppercase tracking-[0.2em] text-neutral-400">
+                  Email
+                </h3>
+                <a
+                  href="mailto:info@example.com"
+                  class="text-sm mt-2 inline-block hover:text-neutral-300 transition-colors"
+                >
+                  info@example.com
+                </a>
+              </div>
+            </div>
+
+            <!-- Phone -->
+            <div class="flex gap-4">
+              <div class="text-neutral-400 text-lg">☎</div>
+              <div>
+                <h3 class="text-[10px] uppercase tracking-[0.2em] text-neutral-400">
+                  Phone
+                </h3>
+                <a
+                  href="tel:+923084368443"
+                  class="text-sm mt-2 inline-block hover:text-neutral-300 transition-colors"
+                >
+                  +92 308 4368443
+                </a>
+              </div>
+            </div>
+
+            <!-- WhatsApp -->
+            <div class="flex gap-4">
+              <div class="text-neutral-400 text-lg">◉</div>
+              <div>
+                <h3 class="text-[10px] uppercase tracking-[0.2em] text-neutral-400">
+                  WhatsApp
+                </h3>
+                <a
+                  href="https://wa.me/923084368443"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-sm mt-2 inline-block hover:text-neutral-300 transition-colors"
+                >
+                  +92 308 4368443
+                </a>
+              </div>
+            </div>
+
+            <!-- Address -->
+            <div class="flex gap-4">
+              <div class="text-neutral-400 text-lg">⌖</div>
+              <div>
+                <h3 class="text-[10px] uppercase tracking-[0.2em] text-neutral-400">
+                  Address
+                </h3>
+                <p class="text-sm leading-6 text-neutral-300 mt-2">
+                  Lahore, Pakistan
+                </p>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="mt-14 pt-7 border-t border-neutral-700">
+            <p class="text-[10px] uppercase tracking-[0.2em] text-neutral-400">
+              Follow Us
+            </p>
+
+            <div class="flex gap-6 mt-5 text-xs">
+              <a href="#" class="hover:text-neutral-300 transition-colors">
+                Instagram
+              </a>
+              <a href="#" class="hover:text-neutral-300 transition-colors">
+                Facebook
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Contact Form -->
+      <div class="lg:col-span-8">
+        <div class="bg-white p-7 sm:p-10 lg:p-12">
+
+          <div class="mb-9">
+            <p class="text-[10px] uppercase tracking-[0.25em] text-neutral-500">
+              Send Us A Message
+            </p>
+
+            <h2 class="font-serif text-3xl mt-3">
+              How can we help you?
+            </h2>
+
+            <p class="text-xs text-neutral-500 mt-3 leading-6">
+              Fill out the form below and our team will get back to you.
+            </p>
+          </div>
+
+          <!-- Success -->
+          @if (successMessage) {
+            <div class="mb-6 p-4 bg-green-50 text-green-700 text-sm">
+              {{ successMessage }}
+            </div>
+          }
+
+          <!-- Error -->
+          @if (errorMessage) {
+            <div class="mb-6 p-4 bg-red-50 text-red-600 text-sm">
+              {{ errorMessage }}
+            </div>
+          }
+
+          <form
+            [formGroup]="contactForm"
+            (ngSubmit)="submitForm()"
+            class="space-y-7"
+          >
+
+            <!-- Name and Email -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+
+              <div>
+                <label class="form-label">Full Name *</label>
+                <input
+                  type="text"
+                  formControlName="name"
+                  placeholder="Enter your name"
+                  class="form-input"
+                />
+
+                @if (f.name.touched && f.name.invalid) {
+                  <p class="form-error">
+                    Please enter at least 2 characters.
+                  </p>
+                }
+              </div>
+
+              <div>
+                <label class="form-label">Email Address *</label>
+                <input
+                  type="email"
+                  formControlName="email"
+                  placeholder="Enter your email"
+                  class="form-input"
+                />
+
+                @if (f.email.touched && f.email.invalid) {
+                  <p class="form-error">
+                    Please enter a valid email address.
+                  </p>
+                }
+              </div>
+
+            </div>
+
+            <!-- Phone and Subject -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+
+              <div>
+                <label class="form-label">Phone Number *</label>
+                <input
+                  type="tel"
+                  formControlName="phone"
+                  placeholder="Enter your phone number"
+                  class="form-input"
+                />
+
+                @if (f.phone.touched && f.phone.invalid) {
+                  <p class="form-error">
+                    Please enter your phone number.
+                  </p>
+                }
+              </div>
+
+              <div>
+                <label class="form-label">Subject *</label>
+                <select
+                  formControlName="subject"
+                  class="form-input"
+                >
+                  <option value="" disabled>Select a subject</option>
+                  <option value="Order Inquiry">Order Inquiry</option>
+                  <option value="Product Inquiry">Product Inquiry</option>
+                  <option value="Shipping & Delivery">Shipping & Delivery</option>
+                  <option value="Return & Exchange">Return & Exchange</option>
+                  <option value="Other">Other</option>
+                </select>
+
+                @if (f.subject.touched && f.subject.invalid) {
+                  <p class="form-error">
+                    Please select a subject.
+                  </p>
+                }
+              </div>
+
+            </div>
+
+            <!-- Message -->
+            <div>
+              <label class="form-label">Your Message *</label>
+              <textarea
+                rows="6"
+                formControlName="message"
+                placeholder="Write your message here..."
+                class="form-input resize-none"
+              ></textarea>
+
+              @if (f.message.touched && f.message.invalid) {
+                <p class="form-error">
+                  Please enter at least 10 characters.
+                </p>
+              }
+            </div>
+
+            <!-- Submit -->
+            <button
+              type="submit"
+              class="w-full sm:w-auto bg-[#171717] text-white px-10 py-4 text-[10px] uppercase tracking-[0.2em] font-semibold hover:bg-neutral-700 transition-colors"
+            >
+              Send Message
+              <span class="ml-3">→</span>
+            </button>
+
+            <p class="text-[10px] text-neutral-400">
+              * Required fields
+            </p>
+
+          </form>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Closing Section -->
+  <section class="px-5 py-16 text-center border-t border-neutral-200">
+    <p class="font-serif text-2xl sm:text-3xl">
+      Elegance in Every Thread.
+    </p>
+
+    <p class="text-[10px] uppercase tracking-[0.2em] text-neutral-500 mt-4">
+      Khani by Khanam
+    </p>
+  </section>
+
+</div>

@@ -97,7 +97,7 @@
             </div>
           } @else {
             <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
-              @for (item of filteredProducts(); track item.id ?? item.sku) {
+              @for (item of filteredProducts(); track item.id ?? item.sku; ) {
                 <app-product-card
                   [product]="item"
                   (wishlistToggle)="toggleWishlist($event)"
