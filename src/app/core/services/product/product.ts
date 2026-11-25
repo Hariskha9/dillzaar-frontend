@@ -163,7 +163,7 @@ getProducts(page: number = 1, perPage: number = 15): Observable<any> {
   params = params.set('max_price', filters.max_price);
 
   return this.http.get<any>(
-    `${this.apiUrl}/products`,
+    `${environment.apiUrl}/admin/products`,
     { params }
   );
 }

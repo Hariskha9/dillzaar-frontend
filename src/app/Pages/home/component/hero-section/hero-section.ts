@@ -1,11 +1,11 @@
 import {
-  Component,
-  OnInit,
+  Component, 
   OnDestroy,
   signal,
   computed,
   PLATFORM_ID,
   inject,
+  afterNextRender,
 } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -28,7 +28,7 @@ export interface HeroSlide {
   templateUrl: './hero-section.html',
   styleUrl: './hero-section.css',
 })
-export class HeroSection implements OnInit, OnDestroy {
+export class HeroSection implements  OnDestroy {
   heroImage = 'DillZaar-lawn.jpg';
   features = [
     { label: 'MADE IN PAKISTAN' },
@@ -90,6 +90,12 @@ export class HeroSection implements OnInit, OnDestroy {
   currentIndex = signal(0);
   isPaused = signal(false);
   currentSlide = computed(() => this.slides[this.currentIndex()]);
+
+  constructor() {
+  afterNextRender(() => {
+    this.startAutoPlay();
+  });
+}
 
   ngOnInit(): void {
     this.startAutoPlay();
